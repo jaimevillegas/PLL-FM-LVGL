@@ -6,7 +6,7 @@ class LGFX : public lgfx::LGFX_Device
   lgfx::Bus_SPI _bus_instance;
   lgfx::Light_PWM _light_instance;
 
-  // lgfx::Touch_XPT2046          _touch_instance;
+  lgfx::Touch_XPT2046 _touch_instance;
 
 public:
   LGFX(void)
@@ -66,26 +66,26 @@ public:
     }
 
     {
-      // auto cfg = _touch_instance.config();
+      auto cfg = _touch_instance.config();
 
-      // cfg.x_min = 0;
-      // cfg.x_max = 239;
-      // cfg.y_min = 0;
-      // cfg.y_max = 479;
-      // cfg.pin_int = -1;
-      // cfg.bus_shared = true;
-      // cfg.offset_rotation = 0;
+      cfg.x_min = 0;
+      cfg.x_max = 319;
+      cfg.y_min = 0;
+      cfg.y_max = 479;
+      cfg.pin_int = -1;
+      cfg.bus_shared = true;
+      cfg.offset_rotation = 0;
 
-      // // SPI接続の場合
-      // cfg.spi_host = VSPI_HOST; // 使用するSPIを選択 (HSPI_HOST or VSPI_HOST)
-      // cfg.freq = 1000000;       // SPIクロックを設定
-      // cfg.pin_sclk = 18;        // SCLKが接続されているピン番号
-      // cfg.pin_mosi = 23;        // MOSIが接続されているピン番号
-      // cfg.pin_miso = 19;        // MISOが接続されているピン番号
-      // cfg.pin_cs = 5;           //   CSが接続されているピン番号
+      // SPI接続の場合
+      cfg.spi_host = VSPI_HOST; // 使用するSPIを選択 (HSPI_HOST or VSPI_HOST)
+      cfg.freq = 1000000;       // SPIクロックを設定
+      cfg.pin_sclk = 18;        // SCLKが接続されているピン番号
+      cfg.pin_mosi = 23;        // MOSIが接続されているピン番号
+      cfg.pin_miso = 19;        // MISOが接続されているピン番号
+      cfg.pin_cs = 22;          //   CSが接続されているピン番号
 
-      // _touch_instance.config(cfg);
-      // _panel_instance.setTouch(&_touch_instance); // タッチスクリーンをパネルにセットします。
+      _touch_instance.config(cfg);
+      _panel_instance.setTouch(&_touch_instance); // タッチスクリーンをパネルにセットします。
     }
     //*/
 

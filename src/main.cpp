@@ -3,9 +3,8 @@
 #include <SPI.h>
 #include "configLovyan.h"
 #include <lvgl.h>
-// #include <lv_demo.h>
 
-#define LGFX_USE_V1
+// #define LGFX_USE_V1
 
 LGFX tft;
 
@@ -92,8 +91,9 @@ void setup()
   tft.begin();
   tft.setRotation(1);
   tft.setBrightness(255);
-  // uint16_t calData[] = {239, 3926, 233, 265, 3856, 3896, 3714, 308};
-  // tft.setTouchCalibrate(calData);
+  // uint16_t calData[8] = {239, 3926, 233, 265, 3856, 3896, 3714, 308};
+  uint16_t calData[5] = {275, 3620, 264, 3532, 1};
+  tft.setTouchCalibrate(calData);
 
   lv_init();
   lv_disp_draw_buf_init(&draw_buf, buf, NULL, screenWidth * 10);
@@ -113,7 +113,6 @@ void setup()
   static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
-  // indev_drv.read_cb = my_touchpad_read;
   lv_indev_drv_register(&indev_drv);
 
   lv_example_get_started_1();
