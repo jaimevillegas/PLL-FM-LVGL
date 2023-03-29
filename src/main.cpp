@@ -91,8 +91,8 @@ void setup()
   tft.begin();
   tft.setRotation(1);
   tft.setBrightness(255);
-  // uint16_t calData[8] = {239, 3926, 233, 265, 3856, 3896, 3714, 308};
-  uint16_t calData[5] = {275, 3620, 264, 3532, 1};
+  uint16_t calData[8] = {239, 3926, 233, 265, 3856, 3896, 3714, 308};
+  // uint16_t calData[5] = {275, 3620, 264, 3532, 1};
   tft.setTouchCalibrate(calData);
 
   lv_init();
@@ -113,6 +113,7 @@ void setup()
   static lv_indev_drv_t indev_drv;
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
+  indev_drv.read_cb = my_touchpad_read;
   lv_indev_drv_register(&indev_drv);
 
   lv_example_get_started_1();
