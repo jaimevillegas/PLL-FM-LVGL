@@ -3,6 +3,7 @@
 #include <SPI.h>
 #include "configLovyan.h"
 #include <lvgl.h>
+#include "ui.h"
 
 LGFX tft;
 
@@ -98,49 +99,49 @@ static void style_init(void)
  */
 void lv_example_get_started_2(void)
 {
-    /*Initialize the style*/
-    style_init();
+  /*Initialize the style*/
+  style_init();
 
-    /*Create a button and use the new styles*/
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());
-    /* Remove the styles coming from the theme
-     * Note that size and position are also stored as style properties
-     * so lv_obj_remove_style_all will remove the set size and position too */
-    lv_obj_remove_style_all(btn);
-    lv_obj_set_pos(btn, 10, 10);
-    lv_obj_set_size(btn, 120, 50);
-    lv_obj_add_style(btn, &style_btn, 0);
-    lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
+  /*Create a button and use the new styles*/
+  lv_obj_t *btn = lv_btn_create(lv_scr_act());
+  /* Remove the styles coming from the theme
+   * Note that size and position are also stored as style properties
+   * so lv_obj_remove_style_all will remove the set size and position too */
+  lv_obj_remove_style_all(btn);
+  lv_obj_set_pos(btn, 10, 10);
+  lv_obj_set_size(btn, 120, 50);
+  lv_obj_add_style(btn, &style_btn, 0);
+  lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
 
-    /*Add a label to the button*/
-    lv_obj_t * label = lv_label_create(btn);
-    lv_label_set_text(label, "Button");
-    lv_obj_center(label);
+  /*Add a label to the button*/
+  lv_obj_t *label = lv_label_create(btn);
+  lv_label_set_text(label, "Button");
+  lv_obj_center(label);
 
-    /*Create another button and use the red style too*/
-    lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
-    lv_obj_remove_style_all(btn2);                      /*Remove the styles coming from the theme*/
-    lv_obj_set_pos(btn2, 10, 80);
-    lv_obj_set_size(btn2, 120, 50);
-    lv_obj_add_style(btn2, &style_btn, 0);
-    lv_obj_add_style(btn2, &style_btn_red, 0);
-    lv_obj_add_style(btn2, &style_btn_pressed, LV_STATE_PRESSED);
-    lv_obj_set_style_radius(btn2, LV_RADIUS_CIRCLE, 0); /*Add a local style too*/
+  /*Create another button and use the red style too*/
+  lv_obj_t *btn2 = lv_btn_create(lv_scr_act());
+  lv_obj_remove_style_all(btn2); /*Remove the styles coming from the theme*/
+  lv_obj_set_pos(btn2, 10, 80);
+  lv_obj_set_size(btn2, 120, 50);
+  lv_obj_add_style(btn2, &style_btn, 0);
+  lv_obj_add_style(btn2, &style_btn_red, 0);
+  lv_obj_add_style(btn2, &style_btn_pressed, LV_STATE_PRESSED);
+  lv_obj_set_style_radius(btn2, LV_RADIUS_CIRCLE, 0); /*Add a local style too*/
 
-    label = lv_label_create(btn2);
-    lv_label_set_text(label, "Button 2");
-    lv_obj_center(label);
+  label = lv_label_create(btn2);
+  lv_label_set_text(label, "Button 2");
+  lv_obj_center(label);
 }
 
-static lv_obj_t * label;
+static lv_obj_t *label;
 
-static void slider_event_cb(lv_event_t * e)
+static void slider_event_cb(lv_event_t *e)
 {
-    lv_obj_t * slider = lv_event_get_target(e);
+  lv_obj_t *slider = lv_event_get_target(e);
 
-    /*Refresh the text*/
-    lv_label_set_text_fmt(label, "%"LV_PRId32, lv_slider_get_value(slider));
-    lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
+  /*Refresh the text*/
+  lv_label_set_text_fmt(label, "%" LV_PRId32, lv_slider_get_value(slider));
+  lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15); /*Align top of the slider*/
 }
 
 /**
@@ -148,19 +149,17 @@ static void slider_event_cb(lv_event_t * e)
  */
 void lv_example_get_started_3(void)
 {
-    /*Create a slider in the center of the display*/
-    lv_obj_t * slider = lv_slider_create(lv_scr_act());
-    lv_obj_set_width(slider, 200);                          /*Set the width*/
-    lv_obj_center(slider);                                  /*Align to the center of the parent (screen)*/
-    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);     /*Assign an event function*/
+  /*Create a slider in the center of the display*/
+  lv_obj_t *slider = lv_slider_create(lv_scr_act());
+  lv_obj_set_width(slider, 200);                                              /*Set the width*/
+  lv_obj_center(slider);                                                      /*Align to the center of the parent (screen)*/
+  lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL); /*Assign an event function*/
 
-    /*Create a label above the slider*/
-    label = lv_label_create(lv_scr_act());
-    lv_label_set_text(label, "0");
-    lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
+  /*Create a label above the slider*/
+  label = lv_label_create(lv_scr_act());
+  lv_label_set_text(label, "0");
+  lv_obj_align_to(label, slider, LV_ALIGN_OUT_TOP_MID, 0, -15); /*Align top of the slider*/
 }
-
-
 
 // ------------------------
 
@@ -196,7 +195,8 @@ void setup()
   indev_drv.read_cb = my_touchpad_read;
   lv_indev_drv_register(&indev_drv);
 
-  lv_example_get_started_3();
+  // lv_example_get_started_3();
+  ui_init();
 }
 
 void loop()
