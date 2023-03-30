@@ -10,6 +10,8 @@
 extern "C" {
 #endif
 
+void turnOnLed(lv_event_t * e);
+void turnOffLed(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/
