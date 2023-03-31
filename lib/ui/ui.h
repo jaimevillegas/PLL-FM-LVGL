@@ -25,28 +25,54 @@ extern "C" {
 #include "ui_events.h"
 void Anim1_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_obj_t * ui_Screen1;
-void ui_event_Panel2(lv_event_t * e);
-extern lv_obj_t * ui_Panel2;
+extern lv_obj_t * ui_Panel5;
+extern lv_obj_t * ui_Panel7;
+extern lv_obj_t * ui_Label6;
+extern lv_obj_t * ui_Slider6;
+extern lv_obj_t * ui_Panel6;
 extern lv_obj_t * ui_Label2;
-extern lv_obj_t * ui_Roller2;
-extern lv_obj_t * ui_Roller1;
-extern lv_obj_t * ui_Roller4;
+extern lv_obj_t * ui_Slider1;
+extern lv_obj_t * ui_Panel8;
 extern lv_obj_t * ui_Label3;
-extern lv_obj_t * ui_Slider2;
-extern lv_obj_t * ui_Panel4;
+extern lv_obj_t * ui_Slider4;
+extern lv_obj_t * ui_Panel9;
+extern lv_obj_t * ui_Label5;
+extern lv_obj_t * ui_Slider5;
+extern lv_obj_t * ui_Panel10;
+extern lv_obj_t * ui_Label7;
+extern lv_obj_t * ui_Slider7;
+extern lv_obj_t * ui_Panel11;
+extern lv_obj_t * ui_Label8;
+extern lv_obj_t * ui_Label4;
+extern lv_obj_t * ui_Label9;
+extern lv_obj_t * ui_Label10;
+extern lv_obj_t * ui_Panel2;
+extern lv_obj_t * ui_btnConfig;
 void ui_event_ImgButton2(lv_event_t * e);
 extern lv_obj_t * ui_ImgButton2;
-extern lv_obj_t * ui_Label4;
-extern lv_obj_t * ui_Screen2;
-void ui_event_Button2(lv_event_t * e);
-extern lv_obj_t * ui_Button2;
+extern lv_obj_t * ui_Label11;
+extern lv_obj_t * ui_Image4;
+extern lv_obj_t * ui_Image2;
+extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_Screen3;
+extern lv_obj_t * ui_Panel3;
+extern lv_obj_t * ui_Roller1;
+extern lv_obj_t * ui_Roller2;
+extern lv_obj_t * ui_Roller3;
 extern lv_obj_t * ui_Panel1;
+void ui_event_ImgButton1(lv_event_t * e);
+extern lv_obj_t * ui_ImgButton1;
+extern lv_obj_t * ui_Label1;
 extern lv_obj_t * ui____initial_actions0;
 
 
-LV_IMG_DECLARE(ui_img_indicator_ver_png);    // assets\indicator_ver.png
+LV_IMG_DECLARE(ui_img_indicator_reduced_hor_png);    // assets\indicator_reduced_hor.png
+LV_IMG_DECLARE(ui_img_config_inact_png);    // assets\config_inact.png
+LV_IMG_DECLARE(ui_img_config_act_png);    // assets\config_act.png
+LV_IMG_DECLARE(ui_img_alarm_png);    // assets\alarm.png
+LV_IMG_DECLARE(ui_img_temp_png);    // assets\Temp.png
+LV_IMG_DECLARE(ui_img_fan_png);    // assets\Fan.png
 LV_IMG_DECLARE(ui_img_btn_1_inact_png);    // assets\btn_1_inact.png
-LV_IMG_DECLARE(ui_img_btn_1_act_png);    // assets\btn_1_act.png
 
 
 
