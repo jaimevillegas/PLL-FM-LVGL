@@ -33,10 +33,13 @@ extern lv_obj_t * ui_ConfigScreen;
 extern lv_obj_t * ui_Panel4;
 extern lv_obj_t * ui_LabelFreqValue1;
 extern lv_obj_t * ui_Roller2;
+void ui_event_ImgButton4(lv_event_t * e);
+extern lv_obj_t * ui_ImgButton4;
 extern lv_obj_t * ui_Panel1;
 void ui_event_ImgButton1(lv_event_t * e);
 extern lv_obj_t * ui_ImgButton1;
-extern lv_obj_t * ui_Label1;
+void ui_event_ImgButton2(lv_event_t * e);
+extern lv_obj_t * ui_ImgButton2;
 void ui_event_Slider2(lv_event_t * e);
 extern lv_obj_t * ui_Slider2;
 extern lv_obj_t * ui_LabelFreqValue2;
@@ -73,16 +76,25 @@ extern lv_obj_t * ui_ImageTemperature;
 extern lv_obj_t * ui_ImageFan;
 void ui_event_AboutScreen(lv_event_t * e);
 extern lv_obj_t * ui_AboutScreen;
+void ui_event_ImgButton5(lv_event_t * e);
+extern lv_obj_t * ui_ImgButton5;
 extern lv_obj_t * ui____initial_actions0;
 
 
-LV_IMG_DECLARE(ui_img_btn_1_inact_png);    // assets\btn_1_inact.png
+LV_IMG_DECLARE(ui_img_btn_sq_info_inact_png);    // assets\btn_sq_info_inact.png
+LV_IMG_DECLARE(ui_img_btn_sq_info_act_png);    // assets\btn_sq_info_act.png
+LV_IMG_DECLARE(ui_img_btn_sq_cancel_inact_png);    // assets\btn_sq_cancel_inact.png
+LV_IMG_DECLARE(ui_img_btn_sq_cancel_act_png);    // assets\btn_sq_cancel_act.png
+LV_IMG_DECLARE(ui_img_btn_sq_check_inact_png);    // assets\btn_sq_check_inact.png
+LV_IMG_DECLARE(ui_img_btn_sq_check_act_png);    // assets\btn_sq_check_act.png
 LV_IMG_DECLARE(ui_img_indicator_reduced_hor_png);    // assets\indicator_reduced_hor.png
 LV_IMG_DECLARE(ui_img_config_inact_png);    // assets\config_inact.png
 LV_IMG_DECLARE(ui_img_config_act_png);    // assets\config_act.png
 LV_IMG_DECLARE(ui_img_alarm_png);    // assets\alarm.png
 LV_IMG_DECLARE(ui_img_temp_png);    // assets\Temp.png
 LV_IMG_DECLARE(ui_img_fan_png);    // assets\Fan.png
+LV_IMG_DECLARE(ui_img_btn_sq_back_inact_png);    // assets\btn_sq_back_inact.png
+LV_IMG_DECLARE(ui_img_btn_sq_back_act_png);    // assets\btn_sq_back_act.png
 
 
 LV_FONT_DECLARE(ui_font_Kanit);
