@@ -57,7 +57,7 @@ extern lv_obj_t * ui_LabelModMPX;
 extern lv_obj_t * ui_SliderModMPX;
 extern lv_obj_t * ui_PanelPotDir;
 extern lv_obj_t * ui_LabelPotDir;
-extern lv_obj_t * ui_SlicerPotDir;
+extern lv_obj_t * ui_SliderPotDir;
 extern lv_obj_t * ui_PanelPotRef;
 extern lv_obj_t * ui_LabelPotRef;
 extern lv_obj_t * ui_SliderPotRef;

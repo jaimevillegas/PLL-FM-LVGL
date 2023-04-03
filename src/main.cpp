@@ -102,9 +102,16 @@ void main_func(void *pvParameters)
     int map_modL_in = map(analogRead(modL_in), 0, 4095, 0, 20);
     int map_modR_in = map(analogRead(modR_in), 0, 4095, 0, 20);
     int map_modMPX_in = map(analogRead(modMPX_in), 0, 4095, 0, 20);
+    int map_temp_in = map(analogRead(temp_in), 0, 1200, 0, 100);
+    int map_potDir_in = map(analogRead(potDir_in), 0, 4095, 0, 20);
+    int map_potRef_in = map(analogRead(potRef_in), 0, 4095, 0, 20);
+    char str_map_temp_in[16];
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
+    lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
+    // lv_slider_set_value(ui_SliderPotDir, map_potDir_in, LV_ANIM_OFF);
+    // lv_slider_set_value(ui_SliderPotRef, map_potRef_in, LV_ANIM_OFF);
   }
 }
 
