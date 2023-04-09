@@ -94,15 +94,27 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
   }
 }
 
+// void lv_style_label_green(void)
+// {
+// }
+
 void main_func(void *pvParameters)
 {
+  // ---- CREATE STYLES ----
+
+  // -----------------------
   while (1)
   {
+    // lv_style_label_green();
+    lv_color_t red1 = lv_color_hex(0xff0c08);
+    static lv_style_t style1;
+    lv_style_init(&style1);
+    lv_style_set_text_color(&style1, red1);
     // TODO -> Declare map umbrals as variables
     int map_modL_in = map(analogRead(modL_in), 0, 4095, 0, 20);
     int map_modR_in = map(analogRead(modR_in), 0, 4095, 0, 20);
     int map_modMPX_in = map(analogRead(modMPX_in), 0, 4095, 0, 20);
-    int map_temp_in = map(analogRead(temp_in), 0, 1200, 0, 100);
+    int map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
     int map_potDir_in = map(analogRead(potDir_in), 0, 4095, 0, 20);
     int map_potRef_in = map(analogRead(potRef_in), 0, 4095, 0, 20);
     char str_map_temp_in[16];
@@ -110,14 +122,34 @@ void main_func(void *pvParameters)
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
     lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
-    // lv_slider_set_value(ui_SliderPotDir, map_potDir_in, LV_ANIM_OFF);
-    // lv_slider_set_value(ui_SliderPotRef, map_potRef_in, LV_ANIM_OFF);
+    lv_slider_set_value(ui_SliderPotDir, map_potDir_in, LV_ANIM_OFF);
+    lv_slider_set_value(ui_SliderPotRef, map_potRef_in, LV_ANIM_OFF);
+
+    // Change temperature label color when >70 (Implement a function later)
+
+    if (map_temp_in >= 70)
+    {
+      // lv_obj_remove_style_all(ui_LabelTemperatureValue);
+      bool flagTemp = 1;
+      while (flagTemp == 1)
+      {
+        lv_obj_add_style(ui_LabelTemperatureValue, &style1, LV_STATE_DEFAULT);
+        flagTemp = 0;
+      }
+      // lv_style_set_text_color(ui_LabelTemperatureValue, lv_color_black());
+      // lv_label_set_recolor(ui_LabelTemperatureValue, true);
+    }
+    else
+    {
+      // lv_label_set_recolor(ui_LabelTemperatureValue, false);
+    }
   }
 }
 
 void setup()
 {
   Serial.begin(115200);
+  pll_setup(98100000);
 
   tft.begin();
   tft.setRotation(1);
