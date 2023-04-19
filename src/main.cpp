@@ -18,8 +18,11 @@
 // ---------------------------
 
 // * ---- FLAG DEFINITIONS -----
-bool flag1_temp = 0;
-bool flag2_temp = 0;
+bool flag1_temp_fan = 0;
+bool flag2_temp_fan = 0;
+
+bool flag1_temp_alarm = 0;
+bool flag2_temp_alarm = 0;
 // * ---------------------------
 
 LGFX tft;
@@ -120,31 +123,53 @@ void main_func(void *pvParameters)
     // TODO: Find documentation about itoa function
     lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
 
-    // TODO: Set 3 levels of temperature
+    // * ---- TEMPERATURE CONDITIONALS -----
+
+    if (map_temp_in >= 50 && flag1_temp_fan == 0)
+    {
+      lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
+      lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
+      fan_rotate_Animation(ui_ImageFan, 0);
+      flag1_temp_fan = 1;
+      flag2_temp_fan = 0;
+    }
+
+    if (map_temp_in < 50)
+    {
+      if (flag2_temp_fan == 0 && flag1_temp_fan == 1)
+      {
+        lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
+        lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
+        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
+        lv_anim_del_all();
+        lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+        flag1_temp_fan = 0;
+        flag2_temp_fan = 1;
+      }
+    }
 
     if (map_temp_in >= 70)
     {
-      if (flag1_temp == 0)
+      if (flag1_temp_alarm == 0)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
+        lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
-        Serial.println("en temp > 70");
-        fan_rotate_Animation(ui_ImageFan, 0);
-        flag1_temp = 1;
-        flag2_temp = 0;
+        lv_obj_fade_in(ui_ImageAlarm, 100, 0);
+        alarm_opacity_Animation(ui_ImageAlarm, 0);
+        flag1_temp_alarm = 1;
+        flag2_temp_alarm = 0;
       }
     }
     if (map_temp_in < 70)
     {
-      if (flag2_temp == 0 && flag1_temp == 1)
+      if (flag2_temp_alarm == 0 && flag1_temp_alarm == 1)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
-        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
-        Serial.println("en temp < 70");
-        lv_anim_del_all();
-        // fan_static_Animation(ui_ImageFan, 0);
-        flag2_temp = 1;
-        flag1_temp = 0;
+        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
+        // TODO: add alarm functionality
+        flag2_temp_alarm = 1;
+        flag1_temp_alarm = 0;
       }
     }
   }
@@ -195,6 +220,10 @@ void setup()
   lv_indev_drv_register(&indev_drv);
 
   ui_init();
+
+  // * --- Dissapear alarm image ---
+  lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+
   xTaskCreatePinnedToCore(main_func,
                           "main_func",
                           4000,

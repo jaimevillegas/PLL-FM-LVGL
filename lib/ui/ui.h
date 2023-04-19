@@ -25,6 +25,7 @@ extern "C" {
 #include "ui_events.h"
 void fan_rotate_Animation(lv_obj_t * TargetObject, int delay);
 void fan_static_Animation(lv_obj_t * TargetObject, int delay);
+void alarm_opacity_Animation(lv_obj_t * TargetObject, int delay);
 void ui_event_LoadingScreen(lv_event_t * e);
 extern lv_obj_t * ui_LoadingScreen;
 extern lv_obj_t * ui_LabelIniciando;
