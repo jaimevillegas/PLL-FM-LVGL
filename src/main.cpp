@@ -17,6 +17,19 @@
 #define potRef_in 34
 // ---------------------------
 
+char str_map_temp_in[16];
+char str_map_dir_in[16];
+char str_map_ref_in[16];
+
+// * ---- MAPPING FORMULAS -----
+int coefficient = 1240;
+int modRValue = 3.3 * coefficient; // First value given in volts
+int modLValue = 3.3 * coefficient;
+int modMPXValue = 3.3 * coefficient;
+int potDirValue = 3.3 * coefficient;
+int potRefValue = 3.3 * coefficient;
+// * ---------------------------
+
 // * ---- FLAG DEFINITIONS -----
 bool flag1_temp_fan = 0;
 bool flag2_temp_fan = 0;
@@ -109,21 +122,23 @@ void main_func(void *pvParameters)
 
     // * --- MAP ANALOG INPUTS TO SLIDERS ---
     // TODO -> Declare map umbrals as variables
-    int map_modL_in = map(analogRead(modL_in), 0, 4095, 0, 20);
-    int map_modR_in = map(analogRead(modR_in), 0, 4095, 0, 20);
-    int map_modMPX_in = map(analogRead(modMPX_in), 0, 4095, 0, 20);
+    int map_modL_in = map(analogRead(modL_in), 0, modLValue, 0, 20);
+    int map_modR_in = map(analogRead(modR_in), 0, modRValue, 0, 20);
+    int map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
     int map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
-    int map_potDir_in = map(analogRead(potDir_in), 0, 4095, 0, 20);
-    int map_potRef_in = map(analogRead(potRef_in), 0, 4095, 0, 20);
-    char str_map_temp_in[16];
+    int map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 120);
+    int map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 12);
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
 
     // TODO: Find documentation about itoa function
     lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
+    lv_label_set_text(ui_LabelPotDirValue, itoa(map_potDir_in, str_map_dir_in, 10));
+    lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
 
     // * ---- TEMPERATURE CONDITIONALS -----
+    // TODO: Set temperature formula to attach LM35
 
     if (map_temp_in >= 50 && flag1_temp_fan == 0)
     {
