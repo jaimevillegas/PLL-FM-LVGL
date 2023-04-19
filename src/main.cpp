@@ -129,17 +129,20 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
         Serial.println("en temp > 70");
+        fan_rotate_Animation(ui_ImageFan, 0);
         flag1_temp = 1;
         flag2_temp = 0;
       }
     }
     if (map_temp_in < 70)
     {
-      if (flag2_temp == 0)
+      if (flag2_temp == 0 && flag1_temp == 1)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
         Serial.println("en temp < 70");
+        lv_anim_del_all();
+        // fan_static_Animation(ui_ImageFan, 0);
         flag2_temp = 1;
         flag1_temp = 0;
       }
