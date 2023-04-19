@@ -1,0 +1,16 @@
+{
+  "codename": "Kanit",
+  "ttf_path": "\\assets\\fonts\\Kanit-Medium.ttf",
+  "bin_path": "\\assets\\fonts\\ui_font_Kanit.bin",
+  "c_path": "\\assets\\fonts\\ui_font_Kanit.c",
+  "cfg_path": "\\assets\\fonts\\ui_font_Kanit.fcfg",
+  "size": 70,
+  "bpp": 8,
+  "letters": 0,
+  "ranges": [
+    "0x20-0x7f"
+  ],
+  "symbols": "",
+  "customparams": "--no-compress --no-prefilter",
+  "uploaded": false
+}
