@@ -17,6 +17,11 @@
 #define potRef_in 34
 // ---------------------------
 
+// * ---- FLAG DEFINITIONS -----
+bool flag1_temp = 0;
+bool flag2_temp = 0;
+// * ---------------------------
+
 LGFX tft;
 
 /*Change to your screen resolution*/
@@ -33,16 +38,11 @@ void pll_setup(long frekvenc)
   long fDivider = (frekvenc + 50000) / 8; // RF frequency input divider 15bits
   long div = fDivider / fReferenca;       // phase comparator calc
 
-  // byte Nr.0
-  polje[0] = 0xc1; // the address of TSA5511 0xC2 8bytes wire library!-->  7bytes=0x61
-  // byte Nr.1
+  polje[0] = 0xc1;                // the address of TSA5511 0xC2 8bytes wire library!-->  7bytes=0x61
   polje[1] = (div & 0xFF00) >> 8; // upper
-  // byte Nr.2
-  polje[2] = div & 0x00FF; // lower
-  // byte Nr.3
-  polje[3] = 0x8E; // 10001110, charge pumper
-  // byte Nr.4
-  polje[4] = 0x00; // set pinouts etc
+  polje[2] = div & 0x00FF;        // lower
+  polje[3] = 0x8E;                // 10001110, charge pumper
+  polje[4] = 0x00;                // set pinouts etc
 
   Wire.beginTransmission(0x61);
   Wire.write(&polje[1]);
@@ -94,10 +94,7 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
   }
 }
 
-// void lv_style_label_green(void)
-// {
-// }
-
+// * --- MAIN FUNCTION --- *
 void main_func(void *pvParameters)
 {
   // ---- CREATE STYLES ----
@@ -105,11 +102,9 @@ void main_func(void *pvParameters)
   // -----------------------
   while (1)
   {
-    // lv_style_label_green();
     lv_color_t red1 = lv_color_hex(0xff0c08);
-    static lv_style_t style1;
-    lv_style_init(&style1);
-    lv_style_set_text_color(&style1, red1);
+
+    // * --- MAP ANALOG INPUTS TO SLIDERS ---
     // TODO -> Declare map umbrals as variables
     int map_modL_in = map(analogRead(modL_in), 0, 4095, 0, 20);
     int map_modR_in = map(analogRead(modR_in), 0, 4095, 0, 20);
@@ -121,27 +116,33 @@ void main_func(void *pvParameters)
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
-    lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
-    lv_slider_set_value(ui_SliderPotDir, map_potDir_in, LV_ANIM_OFF);
-    lv_slider_set_value(ui_SliderPotRef, map_potRef_in, LV_ANIM_OFF);
 
-    // Change temperature label color when >70 (Implement a function later)
+    // TODO: Find documentation about itoa function
+    lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
+
+    // TODO: Set 3 levels of temperature
 
     if (map_temp_in >= 70)
     {
-      // lv_obj_remove_style_all(ui_LabelTemperatureValue);
-      bool flagTemp = 1;
-      while (flagTemp == 1)
+      if (flag1_temp == 0)
       {
-        lv_obj_add_style(ui_LabelTemperatureValue, &style1, LV_STATE_DEFAULT);
-        flagTemp = 0;
+        lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
+        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
+        Serial.println("en temp > 70");
+        flag1_temp = 1;
+        flag2_temp = 0;
       }
-      // lv_style_set_text_color(ui_LabelTemperatureValue, lv_color_black());
-      // lv_label_set_recolor(ui_LabelTemperatureValue, true);
     }
-    else
+    if (map_temp_in < 70)
     {
-      // lv_label_set_recolor(ui_LabelTemperatureValue, false);
+      if (flag2_temp == 0)
+      {
+        lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
+        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
+        Serial.println("en temp < 70");
+        flag2_temp = 1;
+        flag1_temp = 0;
+      }
     }
   }
 }
