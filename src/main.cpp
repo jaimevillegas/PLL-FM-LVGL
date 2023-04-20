@@ -139,12 +139,14 @@ void main_func(void *pvParameters)
 
     // * ---- TEMPERATURE CONDITIONALS -----
     // TODO: Set temperature formula to attach LM35
+    // ? Freq format: 108000000
 
     if (map_temp_in >= 50 && flag1_temp_fan == 0)
     {
       lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
       lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
       fan_rotate_Animation(ui_ImageFan, 0);
+      digitalWrite(fan_out, HIGH);
       flag1_temp_fan = 1;
       flag2_temp_fan = 0;
     }
@@ -157,6 +159,7 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
         lv_anim_del_all();
+        digitalWrite(fan_out, LOW);
         lv_obj_fade_out(ui_ImageAlarm, 100, 0);
         flag1_temp_fan = 0;
         flag2_temp_fan = 1;
@@ -220,6 +223,9 @@ void setup()
   pinMode(potRef_in, INPUT);
   // --------------------------------
 
+  ledcSetup(0, 5000, 8);
+  ledcAttachPin(potDir_out, 0);
+
   /*Change the following line to your display resolution*/
   disp_drv.hor_res = screenWidth;
   disp_drv.ver_res = screenHeight;
@@ -251,5 +257,16 @@ void setup()
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
+  // Serial.print("Apply button state: ");
+  // Serial.println(lv_obj_get_state(ui_btnApply));
+
+  if (lv_obj_get_state(ui_btnApply) == 34)
+  {
+    int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
+    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 100, 0, 255);
+    ledcWrite(0, map_uiSliderPotDirValue);
+    Serial.println(ui_SliderPotDirValue);
+  }
+
   delay(5);
 }
