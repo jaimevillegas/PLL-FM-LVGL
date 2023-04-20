@@ -263,7 +263,7 @@ void loop()
   if (lv_obj_get_state(ui_btnApply) == 34)
   {
     int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
-    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 100, 0, 255);
+    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
     ledcWrite(0, map_uiSliderPotDirValue);
     Serial.println(ui_SliderPotDirValue);
   }
