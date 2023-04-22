@@ -102,11 +102,11 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     data->point.x = touchX;
     data->point.y = touchY;
 
-    Serial.print("Data x ");
-    Serial.println(touchX);
+    // Serial.print("Data x ");
+    // Serial.println(touchX);
 
-    Serial.print("Data y ");
-    Serial.println(touchY);
+    // Serial.print("Data y ");
+    // Serial.println(touchY);
   }
 }
 
@@ -160,7 +160,6 @@ void main_func(void *pvParameters)
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
         lv_anim_del_all();
         digitalWrite(fan_out, LOW);
-        lv_obj_fade_out(ui_ImageAlarm, 100, 0);
         flag1_temp_fan = 0;
         flag2_temp_fan = 1;
       }
@@ -185,6 +184,7 @@ void main_func(void *pvParameters)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
+        lv_obj_fade_out(ui_ImageAlarm, 100, 0);
         // TODO: add alarm functionality
         flag2_temp_alarm = 1;
         flag1_temp_alarm = 0;
@@ -254,6 +254,13 @@ void setup()
                           1);
 }
 
+char valueRoller1_str[20];
+int valueRoller1_int;
+char valueRoller2_str[20];
+int valueRoller2_int;
+int valueFreqHz;
+float valueFreqMhz;
+char valueFreqMhz_str[28];
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
@@ -266,6 +273,20 @@ void loop()
     int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
     ledcWrite(0, map_uiSliderPotDirValue);
     Serial.println(ui_SliderPotDirValue);
+  }
+
+  if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
+  {
+    lv_roller_get_selected_str(ui_rollerFreq1, valueRoller1_str, 0);
+    lv_roller_get_selected_str(ui_rollerFreq2, valueRoller2_str, 0);
+    valueRoller1_int = atoi(valueRoller1_str);
+    valueRoller2_int = atoi(valueRoller2_str);
+    valueFreqHz = valueRoller1_int * 1000000 + valueRoller2_int * 100000;
+    valueFreqMhz = valueFreqHz / 1000000.0;
+    Serial.print("Frequency MHz: ");
+    Serial.println(valueFreqMhz);
+    dtostrf(valueFreqMhz, 3, 1, valueFreqMhz_str);
+    lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
   }
 
   delay(5);
