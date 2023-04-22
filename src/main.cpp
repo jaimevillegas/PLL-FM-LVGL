@@ -9,6 +9,7 @@
 #define potDir_out 25
 #define fan_out 15
 #define buzzer_out 4
+#define mpx_out 32
 #define modL_in 14
 #define modR_in 26
 #define modMPX_in 13
@@ -215,6 +216,7 @@ void setup()
   pinMode(potDir_out, OUTPUT);
   pinMode(fan_out, OUTPUT);
   pinMode(buzzer_out, OUTPUT);
+  pinMode(mpx_out, OUTPUT);
   pinMode(modL_in, INPUT);
   pinMode(modR_in, INPUT);
   pinMode(modMPX_in, INPUT);
@@ -289,5 +291,17 @@ void loop()
     lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
   }
 
+  if (lv_obj_get_state(ui_swMPX) == 35 || lv_obj_get_state(ui_swMPX) == 3)
+  {
+    digitalWrite(mpx_out, HIGH);
+  }
+
+  if (lv_obj_get_state(ui_swMPX) == 0 || lv_obj_get_state(ui_swMPX) == 2)
+  {
+    digitalWrite(mpx_out, LOW);
+  }
+
+  Serial.print("Switch MPX state: ");
+  Serial.println(lv_obj_get_state(ui_swMPX));
   delay(5);
 }
