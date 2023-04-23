@@ -384,7 +384,7 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_style_text_font(ui_lblTitlePotencia, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_panelRollersFreq = lv_obj_create(ui_ConfigScreen);
-    lv_obj_set_width(ui_panelRollersFreq, 240);
+    lv_obj_set_width(ui_panelRollersFreq, 206);
     lv_obj_set_height(ui_panelRollersFreq, 115);
     lv_obj_set_x(ui_panelRollersFreq, -86);
     lv_obj_set_y(ui_panelRollersFreq, -83);
@@ -821,7 +821,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_height(ui_LabelFreqValue, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_LabelFreqValue, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelFreqValue, "101.5");
-    lv_obj_set_style_text_color(ui_LabelFreqValue, lv_color_hex(0x50FF7D), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelFreqValue, lv_color_hex(0x2095F6), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelFreqValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelFreqValue, &ui_font_Kanit, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -832,7 +832,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_y(ui_LabelMHz, 0);
     lv_obj_set_align(ui_LabelMHz, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelMHz, "MHz");
-    lv_obj_set_style_text_color(ui_LabelMHz, lv_color_hex(0x50FF7D), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelMHz, lv_color_hex(0x2095F6), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelMHz, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelMHz, &lv_font_montserrat_38, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -843,7 +843,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_y(ui_LabelMHz1, 0);
     lv_obj_set_align(ui_LabelMHz1, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelMHz1, "FREQ");
-    lv_obj_set_style_text_color(ui_LabelMHz1, lv_color_hex(0x50FF7D), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelMHz1, lv_color_hex(0x2095F6), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelMHz1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelMHz1, &lv_font_montserrat_38, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -923,6 +923,9 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_align(ui_ImageTemperature, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_ImageTemperature, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_ImageTemperature, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_scroll_dir(ui_ImageTemperature, LV_DIR_TOP);
+    lv_obj_set_style_img_recolor(ui_ImageTemperature, lv_color_hex(0x2095F6), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui_ImageTemperature, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ImageFan = lv_img_create(ui_PanelIconsContainer);
     lv_img_set_src(ui_ImageFan, &ui_img_fan_png);

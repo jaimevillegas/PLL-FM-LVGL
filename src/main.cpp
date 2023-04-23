@@ -18,6 +18,16 @@
 #define potRef_in 34
 // ---------------------------
 
+// * Frequency and roller variables
+char valueRoller1_str[20];
+int valueRoller1_int;
+char valueRoller2_str[20];
+int valueRoller2_int;
+int valueFreqHz;
+float valueFreqMhz;
+char valueFreqMhz_str[28];
+
+// * Mapping Variables
 char str_map_temp_in[16];
 char str_map_dir_in[16];
 char str_map_ref_in[16];
@@ -29,7 +39,6 @@ int modLValue = 3.3 * coefficient;
 int modMPXValue = 3.3 * coefficient;
 int potDirValue = 3.3 * coefficient;
 int potRefValue = 3.3 * coefficient;
-// * ---------------------------
 
 // * ---- FLAG DEFINITIONS -----
 bool flag1_temp_fan = 0;
@@ -67,8 +76,8 @@ void pll_setup(long frekvenc)
   Wire.write(&polje[3]);
   Wire.write(&polje[4]);
   Wire.endTransmission();
-  Serial.print("senal enviada al TSA, frec: ");
-  Serial.println(frekvenc);
+  // Serial.print("senal enviada al TSA, frec: ");
+  // Serial.println(frekvenc);
 }
 
 /* Display flushing */
@@ -256,25 +265,16 @@ void setup()
                           1);
 }
 
-char valueRoller1_str[20];
-int valueRoller1_int;
-char valueRoller2_str[20];
-int valueRoller2_int;
-int valueFreqHz;
-float valueFreqMhz;
-char valueFreqMhz_str[28];
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
-  // Serial.print("Apply button state: ");
-  // Serial.println(lv_obj_get_state(ui_btnApply));
 
   if (lv_obj_get_state(ui_btnApply) == 34)
   {
     int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
     int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
     ledcWrite(0, map_uiSliderPotDirValue);
-    Serial.println(ui_SliderPotDirValue);
+    // Serial.println(ui_SliderPotDirValue);
   }
 
   if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
@@ -285,8 +285,8 @@ void loop()
     valueRoller2_int = atoi(valueRoller2_str);
     valueFreqHz = valueRoller1_int * 1000000 + valueRoller2_int * 100000;
     valueFreqMhz = valueFreqHz / 1000000.0;
-    Serial.print("Frequency MHz: ");
-    Serial.println(valueFreqMhz);
+    // Serial.print("Frequency MHz: ");
+    // Serial.println(valueFreqMhz);
     dtostrf(valueFreqMhz, 3, 1, valueFreqMhz_str);
     lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
   }
@@ -301,7 +301,5 @@ void loop()
     digitalWrite(mpx_out, LOW);
   }
 
-  Serial.print("Switch MPX state: ");
-  Serial.println(lv_obj_get_state(ui_swMPX));
-  delay(5);
+  delay(15);
 }
