@@ -26,6 +26,7 @@ int valueRoller2_int;
 int valueFreqHz;
 float valueFreqMhz;
 char valueFreqMhz_str[28];
+char valueRollerMPX_str[10];
 
 // * Mapping Variables
 char str_map_temp_in[16];
@@ -269,13 +270,13 @@ void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
 
-  if (lv_obj_get_state(ui_btnApply) == 34)
-  {
-    int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
-    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
-    ledcWrite(0, map_uiSliderPotDirValue);
-    // Serial.println(ui_SliderPotDirValue);
-  }
+  // if (lv_obj_get_state(ui_btnApply) == 34)
+  // {
+  //   int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
+  //   int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
+  //   ledcWrite(0, map_uiSliderPotDirValue);
+  //   // Serial.println(ui_SliderPotDirValue);
+  // }
 
   if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
   {
@@ -291,12 +292,14 @@ void loop()
     lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
   }
 
-  if (lv_obj_get_state(ui_swMPX) == 35 || lv_obj_get_state(ui_swMPX) == 3)
+  lv_roller_get_selected_str(ui_rollerMPX, valueRollerMPX_str, 0);
+
+  if (valueRollerMPX_str[0] == 'S')
   {
     digitalWrite(mpx_out, HIGH);
   }
 
-  if (lv_obj_get_state(ui_swMPX) == 0 || lv_obj_get_state(ui_swMPX) == 2)
+  if (valueRollerMPX_str[0] == 'M')
   {
     digitalWrite(mpx_out, LOW);
   }
