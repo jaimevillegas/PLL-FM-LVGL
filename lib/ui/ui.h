@@ -77,10 +77,10 @@ extern lv_obj_t * ui_PanelIconsContainer;
 extern lv_obj_t * ui_ButtonConfig;
 void ui_event_ImgButton3(lv_event_t * e);
 extern lv_obj_t * ui_ImgButton3;
-extern lv_obj_t * ui_LabelTemperatureValue;
 extern lv_obj_t * ui_ImageAlarm;
 extern lv_obj_t * ui_ImageTemperature;
 extern lv_obj_t * ui_ImageFan;
+extern lv_obj_t * ui_LabelTemperatureValue;
 extern lv_obj_t * ui_AboutScreen;
 void ui_event_ImgButton5(lv_event_t * e);
 extern lv_obj_t * ui_ImgButton5;
@@ -100,7 +100,7 @@ LV_IMG_DECLARE(ui_img_temp_png);    // assets\Temp.png
 LV_IMG_DECLARE(ui_img_fan_png);    // assets\Fan.png
 
 
-LV_FONT_DECLARE(ui_font_Kanit);
+LV_FONT_DECLARE(ui_font_Mitr);
 
 
 void ui_init(void);

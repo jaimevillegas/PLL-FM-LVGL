@@ -4,6 +4,11 @@
 #include "configLovyan.h"
 #include <lvgl.h>
 #include "ui.h"
+#include <Preferences.h>
+
+#define EEPROM_SIZE 4096
+
+Preferences preferences;
 
 // ----- PIN DEFINITIONS -----
 #define potDir_out 25
@@ -28,6 +33,8 @@ float valueFreqMhz;
 char valueFreqMhz_str[28];
 char valueRollerMPX_str[10];
 
+char str_freq[10];
+
 // * Mapping Variables
 char str_map_temp_in[16];
 char str_map_dir_in[16];
@@ -47,6 +54,9 @@ bool flag2_temp_fan = 0;
 
 bool flag1_temp_alarm = 0;
 bool flag2_temp_alarm = 0;
+
+bool flag1_set_freq = 0;
+bool flag2_set_freq = 0;
 // * ---------------------------
 
 LGFX tft;
@@ -59,6 +69,7 @@ static lv_color_t buf[screenWidth * 10];
 
 void pll_setup(long frekvenc)
 {
+  Serial.print("En PLL SETUP");
   char polje[5];
   long Quartz = 3200000;                  // 3.2Mhz crystal
   long fReferenca = Quartz / 512;         // Divider of Quartz fq/512 = 7.8125kHz (4MHz)  or 6.250kHz(3.2MHz)
@@ -77,8 +88,6 @@ void pll_setup(long frekvenc)
   Wire.write(&polje[3]);
   Wire.write(&polje[4]);
   Wire.endTransmission();
-  // Serial.print("senal enviada al TSA, frec: ");
-  // Serial.println(frekvenc);
 }
 
 /* Display flushing */
@@ -89,7 +98,6 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 
   tft.startWrite();
   tft.setAddrWindow(area->x1, area->y1, w, h);
-  // tft.pushColors( ( uint16_t * )&color_p->full, w * h, true );
   tft.writePixels((lgfx::rgb565_t *)&color_p->full, w * h);
   tft.endWrite();
 
@@ -124,15 +132,34 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 // * --- MAIN FUNCTION --- *
 void main_func(void *pvParameters)
 {
-  // ---- CREATE STYLES ----
+  // * Inicializar Potencia
+  int savedPotDir = preferences.getInt("potDir", false);
+  for (int i = 0; i <= savedPotDir; i++)
+  {
+    ledcWrite(0, i);
+    delay(100);
+  }
 
-  // -----------------------
+  lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+
   while (1)
   {
-    lv_color_t red1 = lv_color_hex(0xff0c08);
+    // * Button Ajustar Frecuencia y Pll_setup
+    if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
+    {
+      lv_roller_get_selected_str(ui_rollerFreq1, valueRoller1_str, 0);
+      lv_roller_get_selected_str(ui_rollerFreq2, valueRoller2_str, 0);
+      valueRoller1_int = atoi(valueRoller1_str);
+      valueRoller2_int = atoi(valueRoller2_str);
+      valueFreqHz = valueRoller1_int * 1000000 + valueRoller2_int * 100000;
+      preferences.putInt("freq", valueFreqHz);
+      valueFreqMhz = valueFreqHz / 1000000.0;
+      dtostrf(valueFreqMhz, 3, 1, valueFreqMhz_str);
+      lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
+      pll_setup(valueFreqHz);
+    }
 
     // * --- MAP ANALOG INPUTS TO SLIDERS ---
-    // TODO -> Declare map umbrals as variables
     int map_modL_in = map(analogRead(modL_in), 0, modLValue, 0, 20);
     int map_modR_in = map(analogRead(modR_in), 0, modRValue, 0, 20);
     int map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
@@ -143,19 +170,20 @@ void main_func(void *pvParameters)
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
 
-    // TODO: Find documentation about itoa function
     lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
     lv_label_set_text(ui_LabelPotDirValue, itoa(map_potDir_in, str_map_dir_in, 10));
     lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
 
     // * ---- TEMPERATURE CONDITIONALS -----
     // TODO: Set temperature formula to attach LM35
-    // ? Freq format: 108000000
 
     if (map_temp_in >= 50 && flag1_temp_fan == 0)
     {
       lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
       lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
+
+      lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
+      lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_2);
       fan_rotate_Animation(ui_ImageFan, 0);
       digitalWrite(fan_out, HIGH);
       flag1_temp_fan = 1;
@@ -169,6 +197,10 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
+
+        lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_1);
+        lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_2);
+        lv_obj_add_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_anim_del_all();
         digitalWrite(fan_out, LOW);
         flag1_temp_fan = 0;
@@ -182,7 +214,11 @@ void main_func(void *pvParameters)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
-        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
+        lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_3);
+
+        lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
+        lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_2);
+        lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_3);
         lv_obj_fade_in(ui_ImageAlarm, 100, 0);
         alarm_opacity_Animation(ui_ImageAlarm, 0);
         flag1_temp_alarm = 1;
@@ -194,7 +230,12 @@ void main_func(void *pvParameters)
       if (flag2_temp_alarm == 0 && flag1_temp_alarm == 1)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
+        lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_3);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
+
+        lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
+        lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_3);
+        lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_fade_out(ui_ImageAlarm, 100, 0);
         // TODO: add alarm functionality
         flag2_temp_alarm = 1;
@@ -207,7 +248,10 @@ void main_func(void *pvParameters)
 void setup()
 {
   Serial.begin(115200);
-  pll_setup(98100000);
+  Wire.begin();
+
+  preferences.begin("storage", false);
+  pll_setup(preferences.getInt("freq", false));
 
   tft.begin();
   tft.setRotation(1);
@@ -257,6 +301,27 @@ void setup()
   // * --- Dissapear alarm image ---
   lv_obj_fade_out(ui_ImageAlarm, 100, 0);
 
+  // * --- Set initial values from preferences ---
+  float freqMhz = preferences.getInt("freq", false) / 1000000.0;
+  dtostrf(freqMhz, 3, 1, valueFreqMhz_str);
+  lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
+
+  if (preferences.getChar("mpx", false) == 83)
+  {
+    digitalWrite(mpx_out, HIGH);
+    lv_roller_set_selected(ui_rollerMPX, 0, LV_ANIM_OFF);
+  }
+
+  if (preferences.getChar("mpx", false) == 77)
+  {
+    digitalWrite(mpx_out, LOW);
+    lv_roller_set_selected(ui_rollerMPX, 1, LV_ANIM_OFF);
+  }
+
+  // TODO: Set initial value for potDir
+  lv_slider_set_value(ui_SliderPotDir, preferences.getInt("potDir", false), LV_ANIM_OFF);
+  lv_label_set_text_fmt(ui_LabelPotDirValue, "%d", preferences.getInt("potDir", false));
+
   xTaskCreatePinnedToCore(main_func,
                           "main_func",
                           4000,
@@ -270,39 +335,45 @@ void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
 
-  // if (lv_obj_get_state(ui_btnApply) == 34)
-  // {
-  //   int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
-  //   int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
-  //   ledcWrite(0, map_uiSliderPotDirValue);
-  //   // Serial.println(ui_SliderPotDirValue);
-  // }
-
-  if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
+  if (lv_obj_get_state(ui_btnAjustarPotencia) == 35)
   {
-    lv_roller_get_selected_str(ui_rollerFreq1, valueRoller1_str, 0);
-    lv_roller_get_selected_str(ui_rollerFreq2, valueRoller2_str, 0);
-    valueRoller1_int = atoi(valueRoller1_str);
-    valueRoller2_int = atoi(valueRoller2_str);
-    valueFreqHz = valueRoller1_int * 1000000 + valueRoller2_int * 100000;
-    valueFreqMhz = valueFreqHz / 1000000.0;
-    // Serial.print("Frequency MHz: ");
-    // Serial.println(valueFreqMhz);
-    dtostrf(valueFreqMhz, 3, 1, valueFreqMhz_str);
-    lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
+    int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
+    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
+    int savedPotDir = preferences.getInt("potDir", false);
+
+    if (savedPotDir > map_uiSliderPotDirValue)
+    {
+      for (int i = savedPotDir; i >= map_uiSliderPotDirValue; i--)
+      {
+        ledcWrite(0, i);
+        delay(50);
+      }
+    }
+    else
+    {
+
+      for (int i = savedPotDir; i <= map_uiSliderPotDirValue; i++)
+      {
+        ledcWrite(0, i);
+        delay(50);
+      }
+    }
+    preferences.putInt("potDir", map_uiSliderPotDirValue);
   }
 
   lv_roller_get_selected_str(ui_rollerMPX, valueRollerMPX_str, 0);
 
   if (valueRollerMPX_str[0] == 'S')
   {
+    preferences.putChar("mpx", 'S');
     digitalWrite(mpx_out, HIGH);
   }
 
   if (valueRollerMPX_str[0] == 'M')
   {
+    preferences.putChar("mpx", 'M');
     digitalWrite(mpx_out, LOW);
   }
 
-  delay(15);
+  delay(20);
 }

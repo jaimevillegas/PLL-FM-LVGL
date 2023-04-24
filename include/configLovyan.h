@@ -56,7 +56,8 @@ public:
     {
       auto cfg = _light_instance.config();
 
-      cfg.pin_bl = 21;
+      // cfg.pin_bl = 21;
+      cfg.pin_bl = 12;
       cfg.invert = false;
       cfg.freq = 44100;
       cfg.pwm_channel = 7;
@@ -82,7 +83,7 @@ public:
       cfg.pin_sclk = 18;        // SCLKが接続されているピン番号
       cfg.pin_mosi = 23;        // MOSIが接続されているピン番号
       cfg.pin_miso = 19;        // MISOが接続されているピン番号
-      cfg.pin_cs = 22;          //   CSが接続されているピン番号
+      cfg.pin_cs = 2;           //   CSが接続されているピン番号
 
       _touch_instance.config(cfg);
       _panel_instance.setTouch(&_touch_instance); // タッチスクリーンをパネルにセットします。
