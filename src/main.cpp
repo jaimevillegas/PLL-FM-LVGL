@@ -48,6 +48,13 @@ int modMPXValue = 3.3 * coefficient;
 int potDirValue = 3.3 * coefficient;
 int potRefValue = 3.3 * coefficient;
 
+int map_modL_in;
+int map_modR_in;
+int map_modMPX_in;
+int map_temp_in;
+int map_potDir_in;
+int map_potRef_in;
+
 // * ---- FLAG DEFINITIONS -----
 bool flag1_temp_fan = 0;
 bool flag2_temp_fan = 0;
@@ -57,7 +64,19 @@ bool flag2_temp_alarm = 0;
 
 bool flag1_set_freq = 0;
 bool flag2_set_freq = 0;
+
+bool flag1_alarms = 0;
+bool flag2_alarms = 0;
+bool flag3_alarms = 0;
+
+bool flag_inicio_alarma = 0;
+
+bool breaker_alarma = 0;
+bool breaker_alarma_icon = 0;
 // * ---------------------------
+
+unsigned long time1 = 0;
+unsigned long time2 = 0;
 
 LGFX tft;
 
@@ -129,10 +148,55 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
   }
 }
 
+// ! --- ALARMS ---
+void alarmSystem()
+{
+  if (flag_inicio_alarma == 1)
+  {
+    // Serial.println("En alarmSystem ");
+    // Serial.print("flag1_alarms: ");
+    // Serial.println(flag1_alarms);
+    // Serial.print("flag2_alarms: ");
+    // Serial.println(flag2_alarms);
+    if (flag1_alarms == 1)
+    {
+      // digitalWrite(buzzer_out, HIGH);
+      // flag_inicio_alarma = 0;
+      // TODO: poner blinking y un if anidado para preguntar si esta en low y poner inicio_alarma en 0
+      time1 = millis();
+      if (time1 - time2 > 1000)
+      {
+        time2 = time1;
+        Serial.println("-------------Timer 1s");
+        breaker_alarma = !breaker_alarma;
+        breaker_alarma_icon = !breaker_alarma_icon;
+        digitalWrite(buzzer_out, breaker_alarma);
+        if (breaker_alarma_icon == 1)
+        {
+          lv_obj_fade_in(ui_ImageAlarm, 100, 0);
+        }
+        if (breaker_alarma_icon == 0)
+        {
+          lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+        }
+      }
+      // Serial.println(map_temp_in);
+    }
+    if (flag1_alarms == 0)
+    {
+      digitalWrite(buzzer_out, LOW);
+      Serial.println("Buzzer LOW");
+      flag_inicio_alarma = 0;
+    }
+  }
+}
+// ! --------------
+
 // * --- MAIN FUNCTION --- *
 void main_func(void *pvParameters)
 {
   // * Inicializar Potencia
+  Serial.println("En main_func");
   int savedPotDir = preferences.getInt("potDir", false);
   for (int i = 0; i <= savedPotDir; i++)
   {
@@ -144,6 +208,7 @@ void main_func(void *pvParameters)
 
   while (1)
   {
+    alarmSystem();
     // * Button Ajustar Frecuencia y Pll_setup
     if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
     {
@@ -160,12 +225,12 @@ void main_func(void *pvParameters)
     }
 
     // * --- MAP ANALOG INPUTS TO SLIDERS ---
-    int map_modL_in = map(analogRead(modL_in), 0, modLValue, 0, 20);
-    int map_modR_in = map(analogRead(modR_in), 0, modRValue, 0, 20);
-    int map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
-    int map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
-    int map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 120);
-    int map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 12);
+    map_modL_in = map(analogRead(modL_in), 0, modLValue, 0, 20);
+    map_modR_in = map(analogRead(modR_in), 0, modRValue, 0, 20);
+    map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
+    map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
+    map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 120);
+    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 12);
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
@@ -219,8 +284,10 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_3);
-        lv_obj_fade_in(ui_ImageAlarm, 100, 0);
-        alarm_opacity_Animation(ui_ImageAlarm, 0);
+        Serial.println("ALARMA > 70");
+        // alarm_opacity_Animation(ui_ImageAlarm, 0);
+        flag1_alarms = 1;
+        flag_inicio_alarma = 1;
         flag1_temp_alarm = 1;
         flag2_temp_alarm = 0;
       }
@@ -238,6 +305,9 @@ void main_func(void *pvParameters)
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_fade_out(ui_ImageAlarm, 100, 0);
         // TODO: add alarm functionality
+        Serial.println("ALARMA < 70");
+        flag1_alarms = 0;
+        flag_inicio_alarma = 1;
         flag2_temp_alarm = 1;
         flag1_temp_alarm = 0;
       }
