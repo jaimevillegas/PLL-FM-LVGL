@@ -69,6 +69,9 @@ bool flag1_alarms = 0;
 bool flag2_alarms = 0;
 bool flag3_alarms = 0;
 
+bool flag1_potRef = 0;
+bool flag2_potRef = 0;
+
 bool flag_inicio_alarma = 0;
 
 bool breaker_alarma = 0;
@@ -309,7 +312,7 @@ void main_func(void *pvParameters)
         flag2_temp_alarm = 0;
       }
     }
-    if (map_temp_in < 70)
+    if ((map_temp_in < 70))
     {
       if (flag2_temp_alarm == 0 && flag1_temp_alarm == 1)
       {
@@ -327,6 +330,43 @@ void main_func(void *pvParameters)
         flag_inicio_alarma = 1;
         flag2_temp_alarm = 1;
         flag1_temp_alarm = 0;
+      }
+    }
+
+    if (map_potRef_in > (map_potDir_in / 10.0))
+    {
+      if (flag1_potRef == 0)
+      {
+        flag_inicio_alarma = 1;
+        flag_potencia_cero = 1;
+        flag1_alarms = 1;
+        flag2_potRef = 0;
+        flag1_potRef = 1;
+      }
+    }
+
+    if (map_potRef_in < (map_potDir_in / 10.0))
+    {
+      if (flag1_potRef == 1 && flag2_potRef == 0)
+      {
+        flag_inicio_alarma = 1;
+        if (flag_potencia_cero == 1)
+        {
+          // * Inicializar Potencia
+          int savedPotDir = preferences.getInt("potDir", false);
+          lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
+          lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
+          for (int i = 0; i <= savedPotDir; i++)
+          {
+            ledcWrite(0, i);
+            delay(100);
+          }
+          lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+          flag_potencia_cero = 0;
+        }
+        flag1_alarms = 0;
+        flag2_potRef = 1;
+        flag1_potRef = 0;
       }
     }
   }
