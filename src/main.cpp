@@ -73,6 +73,7 @@ bool flag_inicio_alarma = 0;
 
 bool breaker_alarma = 0;
 bool breaker_alarma_icon = 0;
+bool flag_potencia_cero = 0;
 // * ---------------------------
 
 unsigned long time1 = 0;
@@ -162,12 +163,11 @@ void alarmSystem()
     {
       // digitalWrite(buzzer_out, HIGH);
       // flag_inicio_alarma = 0;
-      // TODO: poner blinking y un if anidado para preguntar si esta en low y poner inicio_alarma en 0
       time1 = millis();
+      ledcWrite(0, 0);
       if (time1 - time2 > 1000)
       {
         time2 = time1;
-        Serial.println("-------------Timer 1s");
         breaker_alarma = !breaker_alarma;
         breaker_alarma_icon = !breaker_alarma_icon;
         digitalWrite(buzzer_out, breaker_alarma);
@@ -268,6 +268,22 @@ void main_func(void *pvParameters)
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_anim_del_all();
         digitalWrite(fan_out, LOW);
+
+        if (flag_potencia_cero == 1)
+        {
+          // * Inicializar Potencia
+          int savedPotDir = preferences.getInt("potDir", false);
+          lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
+          lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
+          for (int i = 0; i <= savedPotDir; i++)
+          {
+            ledcWrite(0, i);
+            delay(100);
+          }
+          lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+          flag_potencia_cero = 0;
+        }
+
         flag1_temp_fan = 0;
         flag2_temp_fan = 1;
       }
@@ -287,6 +303,7 @@ void main_func(void *pvParameters)
         Serial.println("ALARMA > 70");
         // alarm_opacity_Animation(ui_ImageAlarm, 0);
         flag1_alarms = 1;
+        flag_potencia_cero = 1;
         flag_inicio_alarma = 1;
         flag1_temp_alarm = 1;
         flag2_temp_alarm = 0;
@@ -304,7 +321,7 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_3);
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_fade_out(ui_ImageAlarm, 100, 0);
-        // TODO: add alarm functionality
+
         Serial.println("ALARMA < 70");
         flag1_alarms = 0;
         flag_inicio_alarma = 1;
