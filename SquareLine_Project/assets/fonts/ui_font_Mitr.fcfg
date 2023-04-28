@@ -1,0 +1,16 @@
+{
+  "codename": "Mitr",
+  "ttf_path": "\\assets\\fonts\\Mitr-Regular.ttf",
+  "bin_path": "\\assets\\fonts\\ui_font_Mitr.bin",
+  "c_path": "\\assets\\fonts\\ui_font_Mitr.c",
+  "cfg_path": "\\assets\\fonts\\ui_font_Mitr.fcfg",
+  "size": 60,
+  "bpp": 8,
+  "letters": 0,
+  "ranges": [
+    "0x20-0x7f"
+  ],
+  "symbols": "",
+  "customparams": "--no-compress --no-prefilter",
+  "uploaded": false
+}
