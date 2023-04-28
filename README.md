@@ -1,5 +1,25 @@
 # PLL-FM-LVGL
- PLL FM Stereo with LittleVGL Library
+
+## About the project
+**PLL FM LVGL** is a system that monitors FM Transmitter devices. It has the functionallity to monitor temperature, Power, Audio signals, Antenna status and FM Frequency of the device.
+
+## Built with
+
+### Hardware
+- ESP32
+- TFT 3.5" SPI Display
+- TSA5511 IC
+- Custom PCB with circuits to interface sensors with the microcontroller
+
+## Software
+- PlatformIO Arduino framework for ESP32
+- LovyanGFX to interface with the TFT Display
+- LittleVGL as a library to manage graphical elements on the display
+- SquareLine Studio as a UI Design software
+
+## Screenshots
+
+## I/O pins
 
 | NAME       | PIN | DESCRIPTION              |
 |------------|-----|--------------------------|
