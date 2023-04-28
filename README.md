@@ -18,6 +18,9 @@
 - SquareLine Studio as a UI Design software
 
 ## Screenshots
+![image](https://user-images.githubusercontent.com/5252636/235233701-cbb16249-8196-4086-8f1f-abefa7751b10.png)
+![image](https://user-images.githubusercontent.com/5252636/235233767-fd1c98bc-075a-48a4-96ed-b8f30183ebb1.png)
+
 
 ## I/O pins
 
