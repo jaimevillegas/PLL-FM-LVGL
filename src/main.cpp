@@ -42,9 +42,9 @@ char str_map_ref_in[16];
 
 // * ---- MAPPING FORMULAS -----
 int coefficient = 1240;
-int modRValue = 3.3 * coefficient; // First value given in volts
-int modLValue = 3.3 * coefficient;
-int modMPXValue = 3.3 * coefficient;
+int modRValue = 0.5 * coefficient; // First value given in volts
+int modLValue = 0.5 * coefficient;
+int modMPXValue = 0.5 * coefficient;
 int potDirValue = 3.3 * coefficient;
 int potRefValue = 3.3 * coefficient;
 
@@ -94,10 +94,10 @@ void pll_setup(long frekvenc)
 {
   Serial.print("En PLL SETUP");
   char polje[5];
-  long Quartz = 3200000;                  // 3.2Mhz crystal
-  long fReferenca = Quartz / 512;         // Divider of Quartz fq/512 = 7.8125kHz (4MHz)  or 6.250kHz(3.2MHz)
-  long fDivider = (frekvenc + 50000) / 8; // RF frequency input divider 15bits
-  long div = fDivider / fReferenca;       // phase comparator calc
+  long Quartz = 3200000;            // 3.2Mhz crystal
+  long fReferenca = Quartz / 512;   // Divider of Quartz fq/512 = 7.8125kHz (4MHz)  or 6.250kHz(3.2MHz)
+  long fDivider = (frekvenc) / 8;   // RF frequency input divider 15bits
+  long div = fDivider / fReferenca; // phase comparator calc
 
   polje[0] = 0xc1;                // the address of TSA5511 0xC2 8bytes wire library!-->  7bytes=0x61
   polje[1] = (div & 0xFF00) >> 8; // upper
@@ -168,7 +168,7 @@ void alarmSystem()
       // flag_inicio_alarma = 0;
       time1 = millis();
       ledcWrite(0, 0);
-      if (time1 - time2 > 1000)
+      if (time1 - time2 > 500)
       {
         time2 = time1;
         breaker_alarma = !breaker_alarma;
@@ -195,19 +195,33 @@ void alarmSystem()
 }
 // ! --------------
 
+int potDir_InitialValue = 50;
+
 // * --- MAIN FUNCTION --- *
 void main_func(void *pvParameters)
 {
   // * Inicializar Potencia
   Serial.println("En main_func");
   int savedPotDir = preferences.getInt("potDir", false);
-  for (int i = 0; i <= savedPotDir; i++)
+  for (int i = potDir_InitialValue; i <= savedPotDir; i++)
   {
     ledcWrite(0, i);
     delay(100);
   }
 
   lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+  digitalWrite(buzzer_out, 1);
+  delay(200);
+  digitalWrite(buzzer_out, 0);
+  delay(200);
+  digitalWrite(buzzer_out, 1);
+  delay(200);
+  digitalWrite(buzzer_out, 0);
+  delay(200);
+  digitalWrite(buzzer_out, 1);
+  delay(200);
+  digitalWrite(buzzer_out, 0);
+  delay(200);
 
   while (1)
   {
@@ -278,7 +292,7 @@ void main_func(void *pvParameters)
           int savedPotDir = preferences.getInt("potDir", false);
           lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
           lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
-          for (int i = 0; i <= savedPotDir; i++)
+          for (int i = potDir_InitialValue; i <= savedPotDir; i++)
           {
             ledcWrite(0, i);
             delay(100);
@@ -356,7 +370,7 @@ void main_func(void *pvParameters)
           int savedPotDir = preferences.getInt("potDir", false);
           lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
           lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
-          for (int i = 0; i <= savedPotDir; i++)
+          for (int i = potDir_InitialValue; i <= savedPotDir; i++)
           {
             ledcWrite(0, i);
             delay(100);
@@ -494,12 +508,23 @@ void loop()
   {
     preferences.putChar("mpx", 'S');
     digitalWrite(mpx_out, HIGH);
+
+    //! -----
+    // lv_label_set_text(ui_LabelStereoMpx, "-STEREO-");
+    // lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
+    // lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_2);
+    // lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
   }
 
   if (valueRollerMPX_str[0] == 'M')
   {
     preferences.putChar("mpx", 'M');
     digitalWrite(mpx_out, LOW);
+    //! ---
+    // lv_label_set_text(ui_LabelStereoMpx, "-MPX-");
+    // lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
+    // lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+    // lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_2);
   }
 
   delay(20);
