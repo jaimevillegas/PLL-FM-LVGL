@@ -81,6 +81,8 @@ extern lv_obj_t * ui_ImageAlarm;
 extern lv_obj_t * ui_ImageTemperature;
 extern lv_obj_t * ui_ImageFan;
 extern lv_obj_t * ui_LabelTemperatureValue;
+extern lv_obj_t * ui_ImageStereo;
+extern lv_obj_t * ui_ImageMPX;
 extern lv_obj_t * ui_AboutScreen;
 void ui_event_ImgButton5(lv_event_t * e);
 extern lv_obj_t * ui_ImgButton5;
@@ -98,9 +100,13 @@ LV_IMG_DECLARE(ui_img_config_act_png);    // assets\config_act.png
 LV_IMG_DECLARE(ui_img_alarm_png);    // assets\alarm.png
 LV_IMG_DECLARE(ui_img_temp_png);    // assets\Temp.png
 LV_IMG_DECLARE(ui_img_fan_png);    // assets\Fan.png
+LV_IMG_DECLARE(ui_img_stereo_icon_png);    // assets\STEREO_ICON.png
+LV_IMG_DECLARE(ui_img_mpx_icon_png);    // assets\MPX_ICON.png
 
 
 LV_FONT_DECLARE(ui_font_Mitr);
+LV_FONT_DECLARE(ui_font_MitrSmall);
+LV_FONT_DECLARE(ui_font_MitrMedium);
 
 
 void ui_init(void);

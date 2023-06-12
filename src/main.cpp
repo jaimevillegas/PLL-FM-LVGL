@@ -5,6 +5,7 @@
 #include <lvgl.h>
 #include "ui.h"
 #include <Preferences.h>
+// #include "SPIFFS.h"
 
 #define EEPROM_SIZE 4096
 
@@ -21,6 +22,7 @@ Preferences preferences;
 #define temp_in 36
 #define potDir_in 39
 #define potRef_in 34
+#define led_out 12
 // ---------------------------
 
 // * Frequency and roller variables
@@ -81,6 +83,8 @@ bool flag_potencia_cero = 0;
 
 unsigned long time1 = 0;
 unsigned long time2 = 0;
+unsigned long time3 = 0;
+unsigned long time4 = 0;
 
 LGFX tft;
 
@@ -90,9 +94,18 @@ static const uint32_t screenHeight = 320;
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
 
+// void initSPIFFS()
+// {
+//   if (!SPIFFS.begin())
+//   {
+//     Serial.println("An Error has occurred while mounting SPIFFS");
+//   }
+//   Serial.println("SPIFFS mounted successfully");
+// }
+
 void pll_setup(long frekvenc)
 {
-  Serial.print("En PLL SETUP");
+  // Serial.print("En PLL SETUP");
   char polje[5];
   long Quartz = 3200000;            // 3.2Mhz crystal
   long fReferenca = Quartz / 512;   // Divider of Quartz fq/512 = 7.8125kHz (4MHz)  or 6.250kHz(3.2MHz)
@@ -144,6 +157,9 @@ void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
     data->point.x = touchX;
     data->point.y = touchY;
 
+    ledcWrite(1, 255);
+    time4 = millis();
+
     // Serial.print("Data x ");
     // Serial.println(touchX);
 
@@ -167,7 +183,7 @@ void alarmSystem()
       // digitalWrite(buzzer_out, HIGH);
       // flag_inicio_alarma = 0;
       time1 = millis();
-      ledcWrite(0, 0);
+      ledcWrite(0, 50);
       if (time1 - time2 > 500)
       {
         time2 = time1;
@@ -188,7 +204,7 @@ void alarmSystem()
     if (flag1_alarms == 0)
     {
       digitalWrite(buzzer_out, LOW);
-      Serial.println("Buzzer LOW");
+      // Serial.println("Buzzer LOW");
       flag_inicio_alarma = 0;
     }
   }
@@ -201,7 +217,7 @@ int potDir_InitialValue = 50;
 void main_func(void *pvParameters)
 {
   // * Inicializar Potencia
-  Serial.println("En main_func");
+  // Serial.println("En main_func");
   int savedPotDir = preferences.getInt("potDir", false);
   for (int i = potDir_InitialValue; i <= savedPotDir; i++)
   {
@@ -227,6 +243,13 @@ void main_func(void *pvParameters)
   {
     alarmSystem();
     // * Button Ajustar Frecuencia y Pll_setup
+    Serial.print("BTN Ajustar Frecuencia:");
+    Serial.println(lv_obj_get_state(ui_btnAjustarFreq));
+    if (lv_obj_get_state(ui_btnAjustarFreq) == 34)
+    {
+      ledcWrite(0, 0);
+    }
+
     if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
     {
       lv_roller_get_selected_str(ui_rollerFreq1, valueRoller1_str, 0);
@@ -238,7 +261,14 @@ void main_func(void *pvParameters)
       valueFreqMhz = valueFreqHz / 1000000.0;
       dtostrf(valueFreqMhz, 3, 1, valueFreqMhz_str);
       lv_label_set_text(ui_LabelFreqValue, valueFreqMhz_str);
+      preferences.putInt("roller1", lv_roller_get_selected(ui_rollerFreq1));
+      preferences.putInt("roller2", lv_roller_get_selected(ui_rollerFreq2));
       pll_setup(valueFreqHz);
+      for (int i = potDir_InitialValue; i <= savedPotDir; i++)
+      {
+        ledcWrite(0, i);
+        delay(100);
+      }
     }
 
     // * --- MAP ANALOG INPUTS TO SLIDERS ---
@@ -246,8 +276,8 @@ void main_func(void *pvParameters)
     map_modR_in = map(analogRead(modR_in), 0, modRValue, 0, 20);
     map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
     map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
-    map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 120);
-    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 12);
+    map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
+    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
@@ -272,8 +302,12 @@ void main_func(void *pvParameters)
       flag2_temp_fan = 0;
     }
 
-    if (map_temp_in < 50)
+    if (map_temp_in < 40)
     {
+      if (millis() - time3 > 60000)
+      {
+        digitalWrite(fan_out, LOW);
+      }
       if (flag2_temp_fan == 0 && flag1_temp_fan == 1)
       {
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
@@ -284,7 +318,7 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_anim_del_all();
-        digitalWrite(fan_out, LOW);
+        time3 = millis();
 
         if (flag_potencia_cero == 1)
         {
@@ -317,7 +351,7 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_3);
-        Serial.println("ALARMA > 70");
+        // Serial.println("ALARMA > 70");
         // alarm_opacity_Animation(ui_ImageAlarm, 0);
         flag1_alarms = 1;
         flag_potencia_cero = 1;
@@ -339,7 +373,7 @@ void main_func(void *pvParameters)
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_fade_out(ui_ImageAlarm, 100, 0);
 
-        Serial.println("ALARMA < 70");
+        // Serial.println("ALARMA < 70");
         flag1_alarms = 0;
         flag_inicio_alarma = 1;
         flag2_temp_alarm = 1;
@@ -390,6 +424,7 @@ void setup()
 {
   Serial.begin(115200);
   Wire.begin();
+  // Serial.println("Iniciando...");
 
   preferences.begin("storage", false);
   pll_setup(preferences.getInt("freq", false));
@@ -418,10 +453,17 @@ void setup()
   pinMode(temp_in, INPUT);
   pinMode(potDir_in, INPUT);
   pinMode(potRef_in, INPUT);
+
+  pinMode(led_out, OUTPUT);
   // --------------------------------
 
   ledcSetup(0, 5000, 8);
   ledcAttachPin(potDir_out, 0);
+
+  ledcSetup(1, 5000, 8);
+  ledcAttachPin(led_out, 1);
+  ledcWrite(1, 255);
+  time4 = millis();
 
   /*Change the following line to your display resolution*/
   disp_drv.hor_res = screenWidth;
@@ -451,17 +493,29 @@ void setup()
   {
     digitalWrite(mpx_out, HIGH);
     lv_roller_set_selected(ui_rollerMPX, 0, LV_ANIM_OFF);
+    lv_obj_fade_in(ui_ImageStereo, 0, 0);
+    lv_obj_fade_out(ui_ImageMPX, 0, 0);
   }
 
   if (preferences.getChar("mpx", false) == 77)
   {
     digitalWrite(mpx_out, LOW);
     lv_roller_set_selected(ui_rollerMPX, 1, LV_ANIM_OFF);
+    lv_obj_fade_out(ui_ImageStereo, 0, 0);
+    lv_obj_fade_in(ui_ImageMPX, 0, 0);
   }
+
+  lv_roller_set_selected(ui_rollerFreq1, preferences.getInt("roller1", false), LV_ANIM_OFF);
+  lv_roller_set_selected(ui_rollerFreq2, preferences.getInt("roller2", false), LV_ANIM_OFF);
 
   // TODO: Set initial value for potDir
   lv_slider_set_value(ui_SliderPotDir, preferences.getInt("potDir", false), LV_ANIM_OFF);
   lv_label_set_text_fmt(ui_LabelPotDirValue, "%d", preferences.getInt("potDir", false));
+
+  // char valuePotDir_str[4];
+  // dtostrf(lv_slider_get_value(ui_SliderPotDir), 3, 0, valuePotDir_str);
+  // String strValuePotDir = valuePotDir_str + "W";
+  // lv_label_set_text(ui_LabelPotValue, valuePotDir_str);
 
   xTaskCreatePinnedToCore(main_func,
                           "main_func",
@@ -472,9 +526,16 @@ void setup()
                           1);
 }
 
+int potDirOutMap;
+
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
+
+  if (millis() - time4 > 600000)
+  {
+    ledcWrite(1, 30);
+  }
 
   if (lv_obj_get_state(ui_btnAjustarPotencia) == 35)
   {
@@ -486,7 +547,8 @@ void loop()
     {
       for (int i = savedPotDir; i >= map_uiSliderPotDirValue; i--)
       {
-        ledcWrite(0, i);
+        potDirOutMap = map(i, 0, 300, 50, 255);
+        ledcWrite(0, potDirOutMap);
         delay(50);
       }
     }
@@ -495,11 +557,12 @@ void loop()
 
       for (int i = savedPotDir; i <= map_uiSliderPotDirValue; i++)
       {
-        ledcWrite(0, i);
+        potDirOutMap = map(i, 0, 300, 50, 255);
+        ledcWrite(0, potDirOutMap);
         delay(50);
       }
     }
-    preferences.putInt("potDir", map_uiSliderPotDirValue);
+    preferences.putInt("potDir", potDirOutMap);
   }
 
   lv_roller_get_selected_str(ui_rollerMPX, valueRollerMPX_str, 0);
@@ -508,6 +571,14 @@ void loop()
   {
     preferences.putChar("mpx", 'S');
     digitalWrite(mpx_out, HIGH);
+    // lv_obj_clear_state(ui_ImageStereo, LV_STATE_DEFAULT);
+    // lv_obj_clear_state(ui_ImageStereo, LV_STATE_USER_1);
+    // lv_obj_add_state(ui_ImageStereo, LV_STATE_USER_2);
+    // lv_obj_clear_state(ui_ImageMPX, LV_STATE_DEFAULT);
+    // lv_obj_clear_state(ui_ImageMPX, LV_STATE_USER_2);
+    // lv_obj_add_state(ui_ImageMPX, LV_STATE_USER_1);
+    lv_obj_set_style_opa(ui_ImageStereo, 255, 0);
+    lv_obj_set_style_opa(ui_ImageMPX, 0, 0);
 
     //! -----
     // lv_label_set_text(ui_LabelStereoMpx, "-STEREO-");
@@ -520,6 +591,16 @@ void loop()
   {
     preferences.putChar("mpx", 'M');
     digitalWrite(mpx_out, LOW);
+    // lv_obj_clear_state(ui_ImageStereo, LV_STATE_DEFAULT);
+    // lv_obj_clear_state(ui_ImageStereo, LV_STATE_USER_2);
+    // lv_obj_add_state(ui_ImageStereo, LV_STATE_USER_1);
+    // lv_obj_clear_state(ui_ImageMPX, LV_STATE_DEFAULT);
+    // lv_obj_clear_state(ui_ImageMPX, LV_STATE_USER_1);
+    // lv_obj_add_state(ui_ImageMPX, LV_STATE_USER_2);
+    lv_obj_set_style_opa(ui_ImageStereo, 0, 0);
+    lv_obj_set_style_opa(ui_ImageMPX, 255, 0);
+    // lv_obj_fade_in(ui_ImageStereo, 0, 0);
+    // lv_obj_fade_out(ui_ImageMPX, 0, 0);
     //! ---
     // lv_label_set_text(ui_LabelStereoMpx, "-MPX-");
     // lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
