@@ -41,8 +41,8 @@ extern lv_obj_t * ui_panelRollersFreq;
 extern lv_obj_t * ui_rollerFreq1;
 extern lv_obj_t * ui_lblDotFreq;
 extern lv_obj_t * ui_rollerFreq2;
-void ui_event_btnAjustarFreq(lv_event_t * e);
-extern lv_obj_t * ui_btnAjustarFreq;
+void ui_event_btnAjustarFreq2(lv_event_t * e);
+extern lv_obj_t * ui_btnAjustarFreq2;
 extern lv_obj_t * ui_lblBtnAjustarFreq;
 void ui_event_SliderPotDir(lv_event_t * e);
 extern lv_obj_t * ui_SliderPotDir;
@@ -52,6 +52,8 @@ extern lv_obj_t * ui_btnBack;
 void ui_event_btnAjustarPotencia(lv_event_t * e);
 extern lv_obj_t * ui_btnAjustarPotencia;
 extern lv_obj_t * ui_lblBtnAjustarFreq1;
+void ui_event_btnAjustarFreq(lv_event_t * e);
+extern lv_obj_t * ui_btnAjustarFreq;
 extern lv_obj_t * ui_MainScreen;
 extern lv_obj_t * ui_PanelVuContainer;
 extern lv_obj_t * ui_PanelModR;
@@ -94,9 +96,9 @@ LV_IMG_DECLARE(ui_img_btn_sq_info_inact_png);    // assets\btn_sq_info_inact.png
 LV_IMG_DECLARE(ui_img_btn_sq_info_act_png);    // assets\btn_sq_info_act.png
 LV_IMG_DECLARE(ui_img_btn_sq_back_inact_png);    // assets\btn_sq_back_inact.png
 LV_IMG_DECLARE(ui_img_btn_sq_back_act_png);    // assets\btn_sq_back_act.png
-LV_IMG_DECLARE(ui_img_indicator_reduced_hor_png);    // assets\indicator_reduced_hor.png
 LV_IMG_DECLARE(ui_img_config_inact_png);    // assets\config_inact.png
 LV_IMG_DECLARE(ui_img_config_act_png);    // assets\config_act.png
+LV_IMG_DECLARE(ui_img_indicator_reduced_hor_png);    // assets\indicator_reduced_hor.png
 LV_IMG_DECLARE(ui_img_alarm_png);    // assets\alarm.png
 LV_IMG_DECLARE(ui_img_temp_png);    // assets\Temp.png
 LV_IMG_DECLARE(ui_img_fan_png);    // assets\Fan.png
@@ -105,8 +107,8 @@ LV_IMG_DECLARE(ui_img_mpx_icon_png);    // assets\MPX_ICON.png
 
 
 LV_FONT_DECLARE(ui_font_Mitr);
-LV_FONT_DECLARE(ui_font_MitrSmall);
 LV_FONT_DECLARE(ui_font_MitrMedium);
+LV_FONT_DECLARE(ui_font_MitrSmall);
 
 
 void ui_init(void);

@@ -5,7 +5,6 @@
 #include <lvgl.h>
 #include "ui.h"
 #include <Preferences.h>
-// #include "SPIFFS.h"
 
 #define EEPROM_SIZE 4096
 
@@ -34,7 +33,6 @@ int valueFreqHz;
 float valueFreqMhz;
 char valueFreqMhz_str[28];
 char valueRollerMPX_str[10];
-
 char str_freq[10];
 
 // * Mapping Variables
@@ -79,33 +77,26 @@ bool flag_inicio_alarma = 0;
 bool breaker_alarma = 0;
 bool breaker_alarma_icon = 0;
 bool flag_potencia_cero = 0;
-// * ---------------------------
 
+// * ---- TIME COUNTERS -----
 unsigned long time1 = 0;
 unsigned long time2 = 0;
 unsigned long time3 = 0;
 unsigned long time4 = 0;
 
+int potDir_InitialValue = 50;
+
+// * ---- SCREEN DEFINITIONS -----
 LGFX tft;
 
-/*Change to your screen resolution*/
 static const uint32_t screenWidth = 480;
 static const uint32_t screenHeight = 320;
 static lv_disp_draw_buf_t draw_buf;
 static lv_color_t buf[screenWidth * 10];
 
-// void initSPIFFS()
-// {
-//   if (!SPIFFS.begin())
-//   {
-//     Serial.println("An Error has occurred while mounting SPIFFS");
-//   }
-//   Serial.println("SPIFFS mounted successfully");
-// }
-
+// * Function to setup PLL
 void pll_setup(long frekvenc)
 {
-  // Serial.print("En PLL SETUP");
   char polje[5];
   long Quartz = 3200000;            // 3.2Mhz crystal
   long fReferenca = Quartz / 512;   // Divider of Quartz fq/512 = 7.8125kHz (4MHz)  or 6.250kHz(3.2MHz)
@@ -173,15 +164,8 @@ void alarmSystem()
 {
   if (flag_inicio_alarma == 1)
   {
-    // Serial.println("En alarmSystem ");
-    // Serial.print("flag1_alarms: ");
-    // Serial.println(flag1_alarms);
-    // Serial.print("flag2_alarms: ");
-    // Serial.println(flag2_alarms);
     if (flag1_alarms == 1)
     {
-      // digitalWrite(buzzer_out, HIGH);
-      // flag_inicio_alarma = 0;
       time1 = millis();
       ledcWrite(0, 50);
       if (time1 - time2 > 500)
@@ -199,32 +183,31 @@ void alarmSystem()
           lv_obj_fade_out(ui_ImageAlarm, 100, 0);
         }
       }
-      // Serial.println(map_temp_in);
     }
     if (flag1_alarms == 0)
     {
       digitalWrite(buzzer_out, LOW);
-      // Serial.println("Buzzer LOW");
       flag_inicio_alarma = 0;
     }
   }
 }
-// ! --------------
-
-int potDir_InitialValue = 50;
 
 // * --- MAIN FUNCTION --- *
 void main_func(void *pvParameters)
 {
   // * Inicializar Potencia
-  // Serial.println("En main_func");
   int savedPotDir = preferences.getInt("potDir", false);
   for (int i = potDir_InitialValue; i <= savedPotDir; i++)
   {
+    lv_label_set_text(ui_LabelPotDirValue, "0");
+    lv_label_set_text(ui_LabelPotRefValue, "0");
     ledcWrite(0, i);
     delay(100);
   }
 
+  // TODO: Enviar etiquetas de potencia a cero antes de iniciar potencia
+
+  // * Buzzer después de inicializar potencia
   lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
   digitalWrite(buzzer_out, 1);
   delay(200);
@@ -243,15 +226,15 @@ void main_func(void *pvParameters)
   {
     alarmSystem();
     // * Button Ajustar Frecuencia y Pll_setup
-    Serial.print("BTN Ajustar Frecuencia:");
-    Serial.println(lv_obj_get_state(ui_btnAjustarFreq));
     if (lv_obj_get_state(ui_btnAjustarFreq) == 34)
     {
+      // Cuando se presiona el button se manda potencia a cero
       ledcWrite(0, 0);
     }
 
     if (lv_obj_get_state(ui_btnAjustarFreq) == 35)
     {
+      // Obtener valores de los roller, setear frecuencia y guardar en memoria
       lv_roller_get_selected_str(ui_rollerFreq1, valueRoller1_str, 0);
       lv_roller_get_selected_str(ui_rollerFreq2, valueRoller2_str, 0);
       valueRoller1_int = atoi(valueRoller1_str);
@@ -264,6 +247,8 @@ void main_func(void *pvParameters)
       preferences.putInt("roller1", lv_roller_get_selected(ui_rollerFreq1));
       preferences.putInt("roller2", lv_roller_get_selected(ui_rollerFreq2));
       pll_setup(valueFreqHz);
+
+      // Inicializar potencia de nuevo después de setear frecuencia
       for (int i = potDir_InitialValue; i <= savedPotDir; i++)
       {
         ledcWrite(0, i);
@@ -278,19 +263,21 @@ void main_func(void *pvParameters)
     map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
     map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
     map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+
+    // * --- SET SLIDERS TO ANALOG INPUTS ---
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModL, map_modL_in, LV_ANIM_OFF);
     lv_slider_set_value(ui_SliderModMPX, map_modMPX_in, LV_ANIM_OFF);
 
+    // * --- SET LABELS TO ANALOG INPUTS ---
     lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
     lv_label_set_text(ui_LabelPotDirValue, itoa(map_potDir_in, str_map_dir_in, 10));
     lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
 
     // * ---- TEMPERATURE CONDITIONALS -----
-    // TODO: Set temperature formula to attach LM35
-
     if (map_temp_in >= 50 && flag1_temp_fan == 0)
     {
+      // Cambia color del icono de temperatura y enciende ventilador
       lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
       lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
 
@@ -302,14 +289,16 @@ void main_func(void *pvParameters)
       flag2_temp_fan = 0;
     }
 
-    if (map_temp_in < 40)
+    if (map_temp_in < 45)
     {
       if (millis() - time3 > 60000)
       {
+        // Deja encendido el ventilador un minuto adicional
         digitalWrite(fan_out, LOW);
       }
       if (flag2_temp_fan == 0 && flag1_temp_fan == 1)
       {
+        // restaura colores por defecto, apaga ventilador y alarmas
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_1);
         lv_obj_clear_state(ui_LabelTemperatureValue, LV_STATE_USER_2);
         lv_obj_add_state(ui_LabelTemperatureValue, LV_STATE_DEFAULT);
@@ -351,8 +340,6 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_2);
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_3);
-        // Serial.println("ALARMA > 70");
-        // alarm_opacity_Animation(ui_ImageAlarm, 0);
         flag1_alarms = 1;
         flag_potencia_cero = 1;
         flag_inicio_alarma = 1;
@@ -371,9 +358,8 @@ void main_func(void *pvParameters)
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_DEFAULT);
         lv_obj_clear_state(ui_ImageTemperature, LV_STATE_USER_3);
         lv_obj_add_state(ui_ImageTemperature, LV_STATE_USER_2);
+        // TODO: cambiar fade out
         lv_obj_fade_out(ui_ImageAlarm, 100, 0);
-
-        // Serial.println("ALARMA < 70");
         flag1_alarms = 0;
         flag_inicio_alarma = 1;
         flag2_temp_alarm = 1;
@@ -400,6 +386,7 @@ void main_func(void *pvParameters)
         flag_inicio_alarma = 1;
         if (flag_potencia_cero == 1)
         {
+          lv_obj_fade_out(ui_ImageAlarm, 100, 0);
           // * Inicializar Potencia
           int savedPotDir = preferences.getInt("potDir", false);
           lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
@@ -424,11 +411,8 @@ void setup()
 {
   Serial.begin(115200);
   Wire.begin();
-  // Serial.println("Iniciando...");
-
   preferences.begin("storage", false);
   pll_setup(preferences.getInt("freq", false));
-
   tft.begin();
   tft.setRotation(1);
   tft.setBrightness(255);
@@ -453,7 +437,6 @@ void setup()
   pinMode(temp_in, INPUT);
   pinMode(potDir_in, INPUT);
   pinMode(potRef_in, INPUT);
-
   pinMode(led_out, OUTPUT);
   // --------------------------------
 
@@ -510,7 +493,10 @@ void setup()
 
   // TODO: Set initial value for potDir
   lv_slider_set_value(ui_SliderPotDir, preferences.getInt("potDir", false), LV_ANIM_OFF);
-  lv_label_set_text_fmt(ui_LabelPotDirValue, "%d", preferences.getInt("potDir", false));
+  lv_label_set_text_fmt(ui_LabelPotValue, "%d", preferences.getInt("potDir", false));
+
+  lv_label_set_text(ui_LabelPotDirValue, "0");
+  lv_label_set_text(ui_LabelPotRefValue, "0");
 
   // char valuePotDir_str[4];
   // dtostrf(lv_slider_get_value(ui_SliderPotDir), 3, 0, valuePotDir_str);
@@ -531,6 +517,9 @@ int potDirOutMap;
 void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
+
+  Serial.print("Slider Value: ");
+  Serial.println(lv_slider_get_value(ui_SliderPotDir));
 
   if (millis() - time4 > 600000)
   {
