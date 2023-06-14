@@ -201,6 +201,7 @@ void main_func(void *pvParameters)
   {
     lv_label_set_text(ui_LabelPotDirValue, "0");
     lv_label_set_text(ui_LabelPotRefValue, "0");
+    lv_label_set_text(ui_LabelTemperatureValue, "0");
     ledcWrite(0, i);
     delay(100);
   }
@@ -260,7 +261,7 @@ void main_func(void *pvParameters)
     map_modL_in = map(analogRead(modL_in), 0, modLValue, 0, 20);
     map_modR_in = map(analogRead(modR_in), 0, modRValue, 0, 20);
     map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
-    map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 150);
+    map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 75);
     map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
     map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
 
@@ -289,7 +290,7 @@ void main_func(void *pvParameters)
       flag2_temp_fan = 0;
     }
 
-    if (map_temp_in < 45)
+    if (map_temp_in < 47)
     {
       if (millis() - time3 > 60000)
       {
@@ -497,6 +498,8 @@ void setup()
 
   lv_label_set_text(ui_LabelPotDirValue, "0");
   lv_label_set_text(ui_LabelPotRefValue, "0");
+  lv_label_set_text(ui_LabelTemperatureValue, "0");
+  // lv_label_set_text(ui_LabelPotRefValue, "0");
 
   // char valuePotDir_str[4];
   // dtostrf(lv_slider_get_value(ui_SliderPotDir), 3, 0, valuePotDir_str);

@@ -41,9 +41,6 @@ extern lv_obj_t * ui_panelRollersFreq;
 extern lv_obj_t * ui_rollerFreq1;
 extern lv_obj_t * ui_lblDotFreq;
 extern lv_obj_t * ui_rollerFreq2;
-void ui_event_btnAjustarFreq2(lv_event_t * e);
-extern lv_obj_t * ui_btnAjustarFreq2;
-extern lv_obj_t * ui_lblBtnAjustarFreq;
 void ui_event_SliderPotDir(lv_event_t * e);
 extern lv_obj_t * ui_SliderPotDir;
 extern lv_obj_t * ui_LabelPotValue;
@@ -76,13 +73,12 @@ extern lv_obj_t * ui_LabelFreqValue;
 extern lv_obj_t * ui_LabelMHz;
 extern lv_obj_t * ui_LabelMHz1;
 extern lv_obj_t * ui_PanelIconsContainer;
-extern lv_obj_t * ui_ButtonConfig;
-void ui_event_ImgButton3(lv_event_t * e);
-extern lv_obj_t * ui_ImgButton3;
 extern lv_obj_t * ui_ImageAlarm;
 extern lv_obj_t * ui_ImageTemperature;
 extern lv_obj_t * ui_ImageFan;
 extern lv_obj_t * ui_LabelTemperatureValue;
+void ui_event_ImgButton3(lv_event_t * e);
+extern lv_obj_t * ui_ImgButton3;
 extern lv_obj_t * ui_ImageStereo;
 extern lv_obj_t * ui_ImageMPX;
 extern lv_obj_t * ui_AboutScreen;
@@ -94,14 +90,18 @@ extern lv_obj_t * ui____initial_actions0;
 
 LV_IMG_DECLARE(ui_img_btn_sq_info_inact_png);    // assets\btn_sq_info_inact.png
 LV_IMG_DECLARE(ui_img_btn_sq_info_act_png);    // assets\btn_sq_info_act.png
+LV_IMG_DECLARE(ui_img_indicator_large_hor_png);    // assets\indicator_large_hor.png
+LV_IMG_DECLARE(ui_img_pot_hor_knob_png);    // assets\pot_hor_knob.png
 LV_IMG_DECLARE(ui_img_btn_sq_back_inact_png);    // assets\btn_sq_back_inact.png
 LV_IMG_DECLARE(ui_img_btn_sq_back_act_png);    // assets\btn_sq_back_act.png
-LV_IMG_DECLARE(ui_img_config_inact_png);    // assets\config_inact.png
-LV_IMG_DECLARE(ui_img_config_act_png);    // assets\config_act.png
+LV_IMG_DECLARE(ui_img_setfreq_inact_png);    // assets\setFreq_inact.png
+LV_IMG_DECLARE(ui_img_setfreq_act_png);    // assets\setFreq_act.png
 LV_IMG_DECLARE(ui_img_indicator_reduced_hor_png);    // assets\indicator_reduced_hor.png
 LV_IMG_DECLARE(ui_img_alarm_png);    // assets\alarm.png
 LV_IMG_DECLARE(ui_img_temp_png);    // assets\Temp.png
 LV_IMG_DECLARE(ui_img_fan_png);    // assets\Fan.png
+LV_IMG_DECLARE(ui_img_config_inact_png);    // assets\config_inact.png
+LV_IMG_DECLARE(ui_img_config_act_png);    // assets\config_act.png
 LV_IMG_DECLARE(ui_img_stereo_icon_png);    // assets\STEREO_ICON.png
 LV_IMG_DECLARE(ui_img_mpx_icon_png);    // assets\MPX_ICON.png
 
