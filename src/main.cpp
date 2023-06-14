@@ -197,7 +197,8 @@ void main_func(void *pvParameters)
 {
   // * Inicializar Potencia
   int savedPotDir = preferences.getInt("potDir", false);
-  for (int i = potDir_InitialValue; i <= savedPotDir; i++)
+  int potDirOutMap = map(savedPotDir, 0, 300, 50, 255);
+  for (int i = potDir_InitialValue; i <= potDirOutMap; i++)
   {
     lv_label_set_text(ui_LabelPotDirValue, "0");
     lv_label_set_text(ui_LabelPotRefValue, "0");
@@ -250,7 +251,8 @@ void main_func(void *pvParameters)
       pll_setup(valueFreqHz);
 
       // Inicializar potencia de nuevo después de setear frecuencia
-      for (int i = potDir_InitialValue; i <= savedPotDir; i++)
+      potDirOutMap = map(savedPotDir, 0, 300, 50, 255);
+      for (int i = potDir_InitialValue; i <= potDirOutMap; i++)
       {
         ledcWrite(0, i);
         delay(100);
@@ -521,26 +523,42 @@ void loop()
 {
   lv_timer_handler(); /* let the GUI do its work */
 
-  Serial.print("Slider Value: ");
-  Serial.println(lv_slider_get_value(ui_SliderPotDir));
+  // Serial.print("Slider Value: ");
+  // Serial.println(lv_slider_get_value(ui_SliderPotDir));
 
   if (millis() - time4 > 600000)
   {
     ledcWrite(1, 30);
   }
+  // !---
+  // lv_slider_set_value(ui_SliderPotDir, preferences.getInt("potDir", false), LV_ANIM_OFF);
+
+  // Serial.println(lv_obj_get_state(ui_SliderPotDir));
+
+  if (lv_obj_get_state(ui_SliderPotDir) == 4130)
+  {
+    lv_label_set_text_fmt(ui_LabelPotValue, "%d", lv_slider_get_value(ui_SliderPotDir));
+  }
 
   if (lv_obj_get_state(ui_btnAjustarPotencia) == 35)
   {
     int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
-    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 0, 255);
+    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 50, 255);
     int savedPotDir = preferences.getInt("potDir", false);
+
+    Serial.print("SAVED POT DIR: ");
+    Serial.println(savedPotDir);
+    Serial.print("MAP UI SLIDER POT DIR VALUE: ");
+    Serial.println(map_uiSliderPotDirValue);
 
     if (savedPotDir > map_uiSliderPotDirValue)
     {
+      potDirOutMap = map(savedPotDir, 0, 300, 50, 255);
       for (int i = savedPotDir; i >= map_uiSliderPotDirValue; i--)
       {
-        potDirOutMap = map(i, 0, 300, 50, 255);
-        ledcWrite(0, potDirOutMap);
+        Serial.print("Enviando potencia... ");
+        Serial.println(i);
+        ledcWrite(0, i);
         delay(50);
       }
     }
@@ -549,12 +567,17 @@ void loop()
 
       for (int i = savedPotDir; i <= map_uiSliderPotDirValue; i++)
       {
-        potDirOutMap = map(i, 0, 300, 50, 255);
-        ledcWrite(0, potDirOutMap);
+        Serial.print("Enviando potencia... ");
+        Serial.println(i);
+        ledcWrite(0, i);
         delay(50);
       }
     }
-    preferences.putInt("potDir", potDirOutMap);
+    Serial.print("Potencia obtenida del Slider: ");
+    Serial.println(ui_SliderPotDirValue);
+    Serial.print("Potencia enviada a memoria: ");
+    preferences.putInt("potDir", ui_SliderPotDirValue);
+    Serial.println(preferences.getInt("potDir", false));
   }
 
   lv_roller_get_selected_str(ui_rollerMPX, valueRollerMPX_str, 0);

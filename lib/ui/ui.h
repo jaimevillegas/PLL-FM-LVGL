@@ -91,7 +91,6 @@ extern lv_obj_t * ui____initial_actions0;
 LV_IMG_DECLARE(ui_img_btn_sq_info_inact_png);    // assets\btn_sq_info_inact.png
 LV_IMG_DECLARE(ui_img_btn_sq_info_act_png);    // assets\btn_sq_info_act.png
 LV_IMG_DECLARE(ui_img_indicator_large_hor_png);    // assets\indicator_large_hor.png
-LV_IMG_DECLARE(ui_img_pot_hor_knob_png);    // assets\pot_hor_knob.png
 LV_IMG_DECLARE(ui_img_btn_sq_back_inact_png);    // assets\btn_sq_back_inact.png
 LV_IMG_DECLARE(ui_img_btn_sq_back_act_png);    // assets\btn_sq_back_act.png
 LV_IMG_DECLARE(ui_img_setfreq_inact_png);    // assets\setFreq_inact.png
