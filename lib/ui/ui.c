@@ -27,7 +27,6 @@ lv_obj_t * ui_lblDotFreq;
 lv_obj_t * ui_rollerFreq2;
 void ui_event_SliderPotDir(lv_event_t * e);
 lv_obj_t * ui_SliderPotDir;
-lv_obj_t * ui_LabelPotValue;
 void ui_event_btnBack(lv_event_t * e);
 lv_obj_t * ui_btnBack;
 void ui_event_btnAjustarPotencia(lv_event_t * e);
@@ -35,6 +34,9 @@ lv_obj_t * ui_btnAjustarPotencia;
 lv_obj_t * ui_lblBtnAjustarFreq1;
 void ui_event_btnAjustarFreq(lv_event_t * e);
 lv_obj_t * ui_btnAjustarFreq;
+lv_obj_t * ui_Panel2;
+lv_obj_t * ui_LabelPotValue;
+lv_obj_t * ui_LabelPotValue1;
 lv_obj_t * ui_MainScreen;
 lv_obj_t * ui_PanelVuContainer;
 lv_obj_t * ui_PanelModR;
@@ -215,7 +217,7 @@ void ui_event_btnAjustarFreq(lv_event_t * e)
     lv_obj_t * target = lv_event_get_target(e);
     if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
         _ui_state_modify(ui_rollerFreq2, LV_STATE_USER_1, _UI_MODIFY_STATE_ADD);
-        _ui_state_modify(ui_rollerFreq2, LV_STATE_CHECKED, _UI_MODIFY_STATE_ADD);
+        _ui_state_modify(ui_rollerFreq2, LV_STATE_DISABLED, _UI_MODIFY_STATE_REMOVE);
         _ui_state_modify(ui_rollerFreq1, LV_STATE_DISABLED, _UI_MODIFY_STATE_REMOVE);
         _ui_state_modify(ui_rollerFreq1, LV_STATE_USER_1, _UI_MODIFY_STATE_ADD);
     }
@@ -421,8 +423,7 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_style_bg_opa(ui_rollerFreq2, 255, LV_PART_SELECTED | LV_STATE_DEFAULT);
 
     ui_SliderPotDir = lv_slider_create(ui_ConfigScreen);
-    lv_slider_set_range(ui_SliderPotDir, 0, 300);
-    lv_slider_set_value(ui_SliderPotDir, 100, LV_ANIM_OFF);
+    lv_slider_set_value(ui_SliderPotDir, 50, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_SliderPotDir) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_SliderPotDir, 0,
                                                                                                  LV_ANIM_OFF);
     lv_obj_set_width(ui_SliderPotDir, 300);
@@ -479,20 +480,6 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_style_shadow_ofs_x(ui_SliderPotDir, 0, LV_PART_KNOB | LV_STATE_USER_1);
     lv_obj_set_style_shadow_ofs_y(ui_SliderPotDir, 0, LV_PART_KNOB | LV_STATE_USER_1);
 
-    ui_LabelPotValue = lv_label_create(ui_ConfigScreen);
-    lv_obj_set_width(ui_LabelPotValue, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_LabelPotValue, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_LabelPotValue, 173);
-    lv_obj_set_y(ui_LabelPotValue, 61);
-    lv_obj_set_align(ui_LabelPotValue, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LabelPotValue, "W");
-    lv_obj_add_state(ui_LabelPotValue, LV_STATE_USER_2);       /// States
-    lv_obj_set_style_text_color(ui_LabelPotValue, lv_color_hex(0x52FF7B), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_LabelPotValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LabelPotValue, &ui_font_MitrSmall, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui_LabelPotValue, lv_color_hex(0xF2FF00), LV_PART_MAIN | LV_STATE_USER_1);
-    lv_obj_set_style_text_opa(ui_LabelPotValue, 255, LV_PART_MAIN | LV_STATE_USER_1);
-
     ui_btnBack = lv_imgbtn_create(ui_ConfigScreen);
     lv_imgbtn_set_src(ui_btnBack, LV_IMGBTN_STATE_RELEASED, NULL, &ui_img_btn_sq_back_inact_png, NULL);
     lv_imgbtn_set_src(ui_btnBack, LV_IMGBTN_STATE_PRESSED, NULL, &ui_img_btn_sq_back_act_png, NULL);
@@ -544,6 +531,52 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_flex_flow(ui_btnAjustarFreq, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_btnAjustarFreq, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
     lv_obj_add_flag(ui_btnAjustarFreq, LV_OBJ_FLAG_CHECKABLE);     /// Flags
+
+    ui_Panel2 = lv_obj_create(ui_ConfigScreen);
+    lv_obj_set_width(ui_Panel2, 130);
+    lv_obj_set_height(ui_Panel2, 60);
+    lv_obj_set_x(ui_Panel2, 171);
+    lv_obj_set_y(ui_Panel2, 57);
+    lv_obj_set_align(ui_Panel2, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_Panel2, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_Panel2, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_obj_clear_flag(ui_Panel2, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Panel2, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Panel2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_Panel2, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_Panel2, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_LabelPotValue = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_LabelPotValue, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelPotValue, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelPotValue, 0);
+    lv_obj_set_y(ui_LabelPotValue, -1);
+    lv_obj_set_align(ui_LabelPotValue, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_LabelPotValue, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(ui_LabelPotValue, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_label_set_text(ui_LabelPotValue, "W");
+    lv_obj_add_state(ui_LabelPotValue, LV_STATE_USER_2);       /// States
+    lv_obj_set_style_text_color(ui_LabelPotValue, lv_color_hex(0x52FF7B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_LabelPotValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelPotValue, &ui_font_MitrSmall, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelPotValue, lv_color_hex(0xF2FF00), LV_PART_MAIN | LV_STATE_USER_1);
+    lv_obj_set_style_text_opa(ui_LabelPotValue, 255, LV_PART_MAIN | LV_STATE_USER_1);
+
+    ui_LabelPotValue1 = lv_label_create(ui_Panel2);
+    lv_obj_set_width(ui_LabelPotValue1, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_LabelPotValue1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_LabelPotValue1, 0);
+    lv_obj_set_y(ui_LabelPotValue1, -1);
+    lv_obj_set_align(ui_LabelPotValue1, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(ui_LabelPotValue1, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(ui_LabelPotValue1, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
+    lv_label_set_text(ui_LabelPotValue1, "%");
+    lv_obj_add_state(ui_LabelPotValue1, LV_STATE_USER_2);       /// States
+    lv_obj_set_style_text_color(ui_LabelPotValue1, lv_color_hex(0x52FF7B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_LabelPotValue1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LabelPotValue1, &ui_font_MitrSmall, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_LabelPotValue1, lv_color_hex(0xF2FF00), LV_PART_MAIN | LV_STATE_USER_1);
+    lv_obj_set_style_text_opa(ui_LabelPotValue1, 255, LV_PART_MAIN | LV_STATE_USER_1);
 
     lv_obj_add_event_cb(ui_btnInfo, ui_event_btnInfo, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SliderPotDir, ui_event_SliderPotDir, LV_EVENT_ALL, NULL);

@@ -197,7 +197,7 @@ void main_func(void *pvParameters)
 {
   // * Inicializar Potencia
   int savedPotDir = preferences.getInt("potDir", false);
-  int potDirOutMap = map(savedPotDir, 0, 300, 50, 255);
+  int potDirOutMap = map(savedPotDir, 0, 100, 60, 255);
   for (int i = potDir_InitialValue; i <= potDirOutMap; i++)
   {
     lv_label_set_text(ui_LabelPotDirValue, "0");
@@ -251,7 +251,7 @@ void main_func(void *pvParameters)
       pll_setup(valueFreqHz);
 
       // Inicializar potencia de nuevo después de setear frecuencia
-      potDirOutMap = map(savedPotDir, 0, 300, 50, 255);
+      potDirOutMap = map(savedPotDir, 0, 100, 60, 255);
       for (int i = potDir_InitialValue; i <= potDirOutMap; i++)
       {
         ledcWrite(0, i);
@@ -543,7 +543,7 @@ void loop()
   if (lv_obj_get_state(ui_btnAjustarPotencia) == 35)
   {
     int ui_SliderPotDirValue = lv_slider_get_value(ui_SliderPotDir);
-    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 300, 50, 255);
+    int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 100, 60, 255);
     int savedPotDir = preferences.getInt("potDir", false);
 
     Serial.print("SAVED POT DIR: ");
@@ -553,7 +553,7 @@ void loop()
 
     if (savedPotDir > map_uiSliderPotDirValue)
     {
-      potDirOutMap = map(savedPotDir, 0, 300, 50, 255);
+      potDirOutMap = map(savedPotDir, 0, 100, 60, 255);
       for (int i = savedPotDir; i >= map_uiSliderPotDirValue; i--)
       {
         Serial.print("Enviando potencia... ");
