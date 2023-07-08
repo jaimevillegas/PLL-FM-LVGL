@@ -5,6 +5,12 @@
 #include <lvgl.h>
 #include "ui.h"
 #include <Preferences.h>
+#include <PID_v1.h>
+
+// * ---- PID DEFINITIONS -----
+double Setpoint, Input, Output;
+
+PID myPID(&Input, &Output, &Setpoint, 2, 5, 1, DIRECT);
 
 #define EEPROM_SIZE 4096
 
@@ -265,7 +271,7 @@ void main_func(void *pvParameters)
     map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
     map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 75);
     map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
-    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 50);
 
     // * --- SET SLIDERS TO ANALOG INPUTS ---
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
@@ -443,6 +449,12 @@ void setup()
   pinMode(led_out, OUTPUT);
   // --------------------------------
 
+  // * PID Setup
+  Input = map(analogRead(potDir_in), 0, 255, 0, 300);
+  Setpoint = map(preferences.getInt("potDir", false), 0, 100, 0, 300);
+  myPID.SetMode(AUTOMATIC);
+  // * -------------
+
   ledcSetup(0, 5000, 8);
   ledcAttachPin(potDir_out, 0);
 
@@ -546,18 +558,18 @@ void loop()
     int map_uiSliderPotDirValue = map(ui_SliderPotDirValue, 0, 100, 60, 255);
     int savedPotDir = preferences.getInt("potDir", false);
 
-    Serial.print("SAVED POT DIR: ");
-    Serial.println(savedPotDir);
-    Serial.print("MAP UI SLIDER POT DIR VALUE: ");
-    Serial.println(map_uiSliderPotDirValue);
+    // Serial.print("SAVED POT DIR: ");
+    // Serial.println(savedPotDir);
+    // Serial.print("MAP UI SLIDER POT DIR VALUE: ");
+    // Serial.println(map_uiSliderPotDirValue);
 
     if (savedPotDir > map_uiSliderPotDirValue)
     {
       potDirOutMap = map(savedPotDir, 0, 100, 60, 255);
       for (int i = savedPotDir; i >= map_uiSliderPotDirValue; i--)
       {
-        Serial.print("Enviando potencia... ");
-        Serial.println(i);
+        // Serial.print("Enviando potencia... ");
+        // Serial.println(i);
         ledcWrite(0, i);
         delay(50);
       }
@@ -567,17 +579,23 @@ void loop()
 
       for (int i = savedPotDir; i <= map_uiSliderPotDirValue; i++)
       {
-        Serial.print("Enviando potencia... ");
-        Serial.println(i);
+        // Serial.print("Enviando potencia... ");
+        // Serial.println(i);
         ledcWrite(0, i);
         delay(50);
       }
     }
-    Serial.print("Potencia obtenida del Slider: ");
-    Serial.println(ui_SliderPotDirValue);
-    Serial.print("Potencia enviada a memoria: ");
+    //* ---- PID -----
+    // int savedPotDir = preferences.getInt("potDir", false);
+    Input = map(preferences.getInt("potDir", false), 0, 100, 0, 300);
+    myPID.Compute();
+    potDirOutMap = map(Output, 0, 300, 0, 100);
+    //* --------------
+    // Serial.print("Potencia obtenida del Slider: ");
+    // Serial.println(ui_SliderPotDirValue);
+    // Serial.print("Potencia enviada a memoria: ");
     preferences.putInt("potDir", ui_SliderPotDirValue);
-    Serial.println(preferences.getInt("potDir", false));
+    // Serial.println(preferences.getInt("potDir", false));
   }
 
   lv_roller_get_selected_str(ui_rollerMPX, valueRollerMPX_str, 0);

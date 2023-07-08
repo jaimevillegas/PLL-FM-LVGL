@@ -423,6 +423,7 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_style_bg_opa(ui_rollerFreq2, 255, LV_PART_SELECTED | LV_STATE_DEFAULT);
 
     ui_SliderPotDir = lv_slider_create(ui_ConfigScreen);
+    lv_slider_set_range(ui_SliderPotDir, 0, 300);
     lv_slider_set_value(ui_SliderPotDir, 50, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_SliderPotDir) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_SliderPotDir, 0,
                                                                                                  LV_ANIM_OFF);
@@ -570,7 +571,7 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_align(ui_LabelPotValue1, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_LabelPotValue1, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(ui_LabelPotValue1, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_label_set_text(ui_LabelPotValue1, "%");
+    lv_label_set_text(ui_LabelPotValue1, "W");
     lv_obj_add_state(ui_LabelPotValue1, LV_STATE_USER_2);       /// States
     lv_obj_set_style_text_color(ui_LabelPotValue1, lv_color_hex(0x52FF7B), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelPotValue1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
