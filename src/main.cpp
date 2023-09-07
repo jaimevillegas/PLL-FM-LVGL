@@ -198,14 +198,76 @@ void main_func(void *pvParameters)
   // * Inicializar Potencia
   int savedPotDir = preferences.getInt("potDir", false);
   int potDirOutMap = map(savedPotDir, 0, 100, 60, 255);
-  for (int i = potDir_InitialValue; i <= potDirOutMap; i++)
+
+  int j = 0;
+  int whileAlarmStatus = 0;
+  Serial.print("PotDirOutMap Value: ");
+  Serial.println(potDirOutMap);
+  while (j <= potDirOutMap)
   {
-    lv_label_set_text(ui_LabelPotDirValue, "0");
-    lv_label_set_text(ui_LabelPotRefValue, "0");
-    lv_label_set_text(ui_LabelTemperatureValue, "0");
-    ledcWrite(0, i);
+    // * --- MAP ANALOG INPUTS TO SLIDERS ---
+    map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 75);
+    map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
+    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+
+    // * --- SET LABELS TO ANALOG INPUTS ---
+    lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
+    lv_label_set_text(ui_LabelPotDirValue, itoa(map_potDir_in, str_map_dir_in, 10));
+    lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
+
+    if (map_potRef_in > (map_potDir_in / 10.0))
+    {
+      ledcWrite(0, 0);
+      // lv_obj_fade_in(ui_ImageAlarm, 100, 0);
+      lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+      lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_2);
+      lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_3);
+      digitalWrite(buzzer_out, 1);
+      whileAlarmStatus = 1;
+    }
+    else
+    {
+      if (whileAlarmStatus == 1)
+      {
+        j = 0;
+        whileAlarmStatus = 0;
+      }
+      lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_3);
+      lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_2);
+      lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
+      digitalWrite(buzzer_out, 0);
+      Serial.print("Enviando potencia en Init... ");
+      Serial.println(j);
+      ledcWrite(0, j);
+      j++;
+    }
     delay(100);
   }
+
+  // for (int i = potDir_InitialValue; i <= potDirOutMap; i++)
+  // {
+
+  //   // * --- MAP ANALOG INPUTS TO SLIDERS ---
+  //   map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 75);
+  //   map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
+  //   map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+
+  //   // * --- SET LABELS TO ANALOG INPUTS ---
+  //   lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
+  //   lv_label_set_text(ui_LabelPotDirValue, itoa(map_potDir_in, str_map_dir_in, 10));
+  //   lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
+
+  //   if (map_potRef_in > (map_potDir_in / 10.0))
+  //   {
+  //     ledcWrite(0, 0);
+  //   }
+  //   else
+  //   {
+  //     ledcWrite(0, i);
+  //   }
+
+  //   delay(100);
+  // }
 
   // TODO: Enviar etiquetas de potencia a cero antes de iniciar potencia
 
@@ -556,7 +618,7 @@ void loop()
       potDirOutMap = map(savedPotDir, 0, 100, 60, 255);
       for (int i = savedPotDir; i >= map_uiSliderPotDirValue; i--)
       {
-        Serial.print("Enviando potencia... ");
+        Serial.print("Enviando potencia en Boton... ");
         Serial.println(i);
         ledcWrite(0, i);
         delay(50);

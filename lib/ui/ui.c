@@ -554,7 +554,7 @@ void ui_ConfigScreen_screen_init(void)
     lv_obj_set_align(ui_LabelPotValue, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_LabelPotValue, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(ui_LabelPotValue, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_label_set_text(ui_LabelPotValue, "W");
+    lv_label_set_text(ui_LabelPotValue, "");
     lv_obj_add_state(ui_LabelPotValue, LV_STATE_USER_2);       /// States
     lv_obj_set_style_text_color(ui_LabelPotValue, lv_color_hex(0x52FF7B), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelPotValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -880,12 +880,13 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_y(ui_LabelFreqValue, 3);
     lv_obj_set_align(ui_LabelFreqValue, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LabelFreqValue, "101.5");
-    lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);       /// States
     lv_obj_set_style_text_color(ui_LabelFreqValue, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LabelFreqValue, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LabelFreqValue, &ui_font_Mitr, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui_LabelFreqValue, lv_color_hex(0xFFFF20), LV_PART_MAIN | LV_STATE_USER_1);
     lv_obj_set_style_text_opa(ui_LabelFreqValue, 255, LV_PART_MAIN | LV_STATE_USER_1);
+    lv_obj_set_style_text_color(ui_LabelFreqValue, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_USER_3);
+    lv_obj_set_style_text_opa(ui_LabelFreqValue, 255, LV_PART_MAIN | LV_STATE_USER_3);
 
     ui_LabelMHz = lv_label_create(ui_PanelFreqContainer);
     lv_obj_set_width(ui_LabelMHz, LV_SIZE_CONTENT);   /// 1
