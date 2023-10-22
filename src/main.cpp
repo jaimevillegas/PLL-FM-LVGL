@@ -84,6 +84,9 @@ unsigned long time2 = 0;
 unsigned long time3 = 0;
 unsigned long time4 = 0;
 
+unsigned long timerRefleja1 = 0;
+unsigned long timerRefleja2 = 0;
+
 int potDir_InitialValue = 50;
 
 // * ---- SCREEN DEFINITIONS -----
@@ -215,7 +218,8 @@ void main_func(void *pvParameters)
     lv_label_set_text(ui_LabelPotDirValue, itoa(map_potDir_in, str_map_dir_in, 10));
     lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
 
-    if (map_potRef_in > (map_potDir_in / 10.0))
+    // if (map_potRef_in > (map_potDir_in / 10.0))
+    if (map_potRef_in > 30)
     {
       ledcWrite(0, 0);
       // lv_obj_fade_in(ui_ImageAlarm, 100, 0);
@@ -432,43 +436,102 @@ void main_func(void *pvParameters)
       }
     }
 
-    if (map_potRef_in > (map_potDir_in / 10.0))
+    //! Cambiar esta funcionalidad para mayor de 30W y time delay de 30seg
+    if (map_potRef_in > 30)
     {
       if (flag1_potRef == 0)
       {
+        Serial.println("Mayor de 30");
+        Serial.print("Saved Pot Dir: ");
+        Serial.println(savedPotDir);
+        ledcWrite(0, 0);
+        timerRefleja1 = 0;
         flag_inicio_alarma = 1;
-        flag_potencia_cero = 1;
+        // flag_potencia_cero = 1;
         flag1_alarms = 1;
         flag2_potRef = 0;
         flag1_potRef = 1;
       }
     }
 
-    if (map_potRef_in < (map_potDir_in / 10.0))
+    if (map_potRef_in < 30 && flag1_potRef == 1 && flag2_potRef == 0)
     {
-      if (flag1_potRef == 1 && flag2_potRef == 0)
+      flag_inicio_alarma = 1;
+      Serial.println("Menor de 30");
+      digitalWrite(buzzer_out, LOW);
+      lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+      // if (flag_potencia_cero == 1)
+      // {
+
+      // timerRefleja1 = millis();
+      delay(30000);
+      Serial.println("Dentro de flag_potencia_cero");
+      flag1_alarms = 0;
+
+      for (int i = potDir_InitialValue; i <= map(savedPotDir, 0, 100, 60, 255); i++)
       {
-        flag_inicio_alarma = 1;
-        if (flag_potencia_cero == 1)
+        ledcWrite(0, i);
+        Serial.print("Saved Pot Dir: ");
+        Serial.println(savedPotDir);
+        Serial.print("Enviando potencia...");
+        Serial.println(i);
+        map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+        lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
+        if (map_potRef_in > 30)
         {
-          lv_obj_fade_out(ui_ImageAlarm, 100, 0);
-          // * Inicializar Potencia
-          int savedPotDir = preferences.getInt("potDir", false);
-          lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
-          lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
-          for (int i = potDir_InitialValue; i <= savedPotDir; i++)
-          {
-            ledcWrite(0, i);
-            delay(100);
-          }
-          lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
-          flag_potencia_cero = 0;
+          Serial.println("En Break");
+          break;
         }
-        flag1_alarms = 0;
-        flag2_potRef = 1;
-        flag1_potRef = 0;
+        delay(100);
+        // }
+        // flag_potencia_cero = 0;
+        // if (timerRefleja1 - 0 > 500)
+        // {
+        //   Serial.print("Timer Refleja: ");
+        //   Serial.println(timerRefleja1 - 0);
+        // }
       }
+      flag2_potRef = 1;
+      flag1_potRef = 0;
     }
+
+    // if (map_potRef_in > (map_potDir_in / 10.0))
+    // {
+    //   if (flag1_potRef == 0)
+    //   {
+    //     flag_inicio_alarma = 1;
+    //     flag_potencia_cero = 1;
+    //     flag1_alarms = 1;
+    //     flag2_potRef = 0;
+    //     flag1_potRef = 1;
+    //   }
+    // }
+
+    // if (map_potRef_in < (map_potDir_in / 10.0))
+    // {
+    //   if (flag1_potRef == 1 && flag2_potRef == 0)
+    //   {
+    //     flag_inicio_alarma = 1;
+    //     if (flag_potencia_cero == 1)
+    //     {
+    //       lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+    //       // * Inicializar Potencia
+    //       int savedPotDir = preferences.getInt("potDir", false);
+    //       lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_DEFAULT);
+    //       lv_obj_add_state(ui_LabelFreqValue, LV_STATE_USER_1);
+    //       for (int i = potDir_InitialValue; i <= savedPotDir; i++)
+    //       {
+    //         ledcWrite(0, i);
+    //         delay(100);
+    //       }
+    //       lv_obj_clear_state(ui_LabelFreqValue, LV_STATE_USER_1);
+    //       flag_potencia_cero = 0;
+    //     }
+    //     flag1_alarms = 0;
+    //     flag2_potRef = 1;
+    //     flag1_potRef = 0;
+    //   }
+    // }
   }
 }
 
