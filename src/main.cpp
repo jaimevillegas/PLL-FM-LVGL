@@ -398,7 +398,7 @@ void main_func(void *pvParameters)
       }
     }
 
-    if (map_temp_in >= 70)
+    if (map_temp_in >= 80)
     {
       if (flag1_temp_alarm == 0)
       {
@@ -416,7 +416,7 @@ void main_func(void *pvParameters)
         flag2_temp_alarm = 0;
       }
     }
-    if ((map_temp_in < 70))
+    if ((map_temp_in < 80))
     {
       if (flag2_temp_alarm == 0 && flag1_temp_alarm == 1)
       {
