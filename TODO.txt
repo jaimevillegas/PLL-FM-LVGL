@@ -1,0 +1,5 @@
+Learn how to split the code in multiple files.
+
+https://forum.arduino.cc/t/correct-way-to-include-multiple-files/507705/3
+
+https://docs.arduino.cc/learn/contributions/arduino-creating-library-guide

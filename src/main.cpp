@@ -211,7 +211,7 @@ void main_func(void *pvParameters)
     // * --- MAP ANALOG INPUTS TO SLIDERS ---
     map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 75);
     map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
-    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 50);
 
     // * --- SET LABELS TO ANALOG INPUTS ---
     lv_label_set_text(ui_LabelTemperatureValue, itoa(map_temp_in, str_map_temp_in, 10));
@@ -331,7 +331,7 @@ void main_func(void *pvParameters)
     map_modMPX_in = map(analogRead(modMPX_in), 0, modMPXValue, 0, 20);
     map_temp_in = map(analogRead(temp_in), 0, 4095, 0, 75);
     map_potDir_in = map(analogRead(potDir_in), 0, potDirValue, 0, 300);
-    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+    map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 50);
 
     // * --- SET SLIDERS TO ANALOG INPUTS ---
     lv_slider_set_value(ui_SliderModR, map_modR_in, LV_ANIM_OFF);
@@ -458,8 +458,9 @@ void main_func(void *pvParameters)
     {
       flag_inicio_alarma = 1;
       Serial.println("Menor de 30");
-      digitalWrite(buzzer_out, LOW);
-      lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+      digitalWrite(buzzer_out, HIGH);
+      // lv_obj_fade_out(ui_ImageAlarm, 100, 0);
+      lv_obj_fade_in(ui_ImageAlarm, 100, 0);
       // if (flag_potencia_cero == 1)
       // {
 
@@ -475,7 +476,7 @@ void main_func(void *pvParameters)
         Serial.println(savedPotDir);
         Serial.print("Enviando potencia...");
         Serial.println(i);
-        map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 300);
+        map_potRef_in = map(analogRead(potRef_in), 0, potRefValue, 0, 50);
         lv_label_set_text(ui_LabelPotRefValue, itoa(map_potRef_in, str_map_ref_in, 10));
         if (map_potRef_in > 30)
         {
@@ -491,6 +492,8 @@ void main_func(void *pvParameters)
         //   Serial.println(timerRefleja1 - 0);
         // }
       }
+      digitalWrite(buzzer_out, LOW);
+      lv_obj_fade_out(ui_ImageAlarm, 100, 0);
       flag2_potRef = 1;
       flag1_potRef = 0;
     }
