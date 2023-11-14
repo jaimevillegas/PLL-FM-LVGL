@@ -465,7 +465,7 @@ void main_func(void *pvParameters)
       // {
 
       // timerRefleja1 = millis();
-      delay(30000);
+      delay(5000);
       Serial.println("Dentro de flag_potencia_cero");
       flag1_alarms = 0;
 
